@@ -44,10 +44,9 @@ Built with **Electron + React/TypeScript** and **TypeORM ORM**. Focused on simpl
 
 ## 🚀 Roadmap
 1. Attendance module (manual + RFID)  
-2. Payroll engine (basic rules)  
-3. Role-based UI (Admin/Employee)  
-4. Export reports (CSV/PDF)  
-5. Lite release packaging  
+2. Payroll engine (basic rules)
+3. Export reports (CSV/PDF)  
+4. Lite release packaging  
 
 ---
 
