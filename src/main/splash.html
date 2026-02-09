@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayTrack Lite - Loading</title>
+    <style>
+      :root {
+        /* Material Design 3 Color System - Blue as primary */
+        --md-sys-color-primary: #006a6a;
+        --md-sys-color-on-primary: #ffffff;
+        --md-sys-color-primary-container: #6ff7f6;
+        --md-sys-color-on-primary-container: #002020;
+        --md-sys-color-secondary: #4a6363;
+        --md-sys-color-on-secondary: #ffffff;
+        --md-sys-color-secondary-container: #cce8e7;
+        --md-sys-color-on-secondary-container: #051f1f;
+        --md-sys-color-tertiary: #4a607c;
+        --md-sys-color-on-tertiary: #ffffff;
+        --md-sys-color-tertiary-container: #d2e4ff;
+        --md-sys-color-on-tertiary-container: #021c35;
+        --md-sys-color-error: #ba1a1a;
+        --md-sys-color-on-error: #ffffff;
+        --md-sys-color-error-container: #ffdad6;
+        --md-sys-color-on-error-container: #410002;
+        --md-sys-color-surface: #f7faf9;
+        --md-sys-color-on-surface: #191c1c;
+        --md-sys-color-surface-variant: #dae5e4;
+        --md-sys-color-on-surface-variant: #3f4948;
+        --md-sys-color-outline: #6f7979;
+
+        /* Elevation levels */
+        --md-sys-elevation-level0: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+        --md-sys-elevation-level1:
+          0px 1px 3px 1px rgba(0, 0, 0, 0.15),
+          0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+        --md-sys-elevation-level2:
+          0px 2px 6px 2px rgba(0, 0, 0, 0.15),
+          0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+        --md-sys-elevation-level3:
+          0px 4px 8px 3px rgba(0, 0, 0, 0.15),
+          0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+        --md-sys-elevation-level4:
+          0px 6px 10px 4px rgba(0, 0, 0, 0.15),
+          0px 2px 3px 0px rgba(0, 0, 0, 0.3);
+
+        /* Animation curves */
+        --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+        --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+        --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(
+          0.05,
+          0.7,
+          0.1,
+          1
+        );
+        --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(
+          0.3,
+          0,
+          0.8,
+          0.15
+        );
+
+        /* Typography - Using system fonts */
+        --md-sys-typescale-display-large-font:
+          400 57px/64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-display-medium-font:
+          400 45px/52px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-display-small-font:
+          400 36px/44px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-headline-large-font:
+          400 32px/40px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-headline-medium-font:
+          400 28px/36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-headline-small-font:
+          400 24px/32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-title-large-font:
+          400 22px/28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-title-medium-font:
+          500 16px/24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-title-small-font:
+          500 14px/20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-body-large-font:
+          400 16px/24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-body-medium-font:
+          400 14px/20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-body-small-font:
+          400 12px/16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-label-large-font:
+          500 14px/20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-label-medium-font:
+          500 12px/16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        --md-sys-typescale-label-small-font:
+          500 11px/16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--md-sys-color-surface) 0%,
+          #e8f3f3 100%
+        );
+        color: var(--md-sys-color-on-surface);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      /* Main container with Material elevation */
+      .app-container {
+        width: 100%;
+        max-width: 440px;
+        background: var(--md-sys-color-surface);
+        padding: 56px 40px 40px;
+        text-align: center;
+        position: relative;
+        animation: container-enter 0.6s
+          var(--md-sys-motion-easing-emphasized-decelerate);
+        overflow: hidden;
+        border: none; /* Remove any border */
+      }
+
+      /* App logo with Material Design shape */
+      .app-logo {
+        width: 88px;
+        height: 88px;
+        margin: 0 auto 28px;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--md-sys-color-on-primary);
+        box-shadow: var(--md-sys-elevation-level2);
+        position: relative;
+        z-index: 1;
+        transform: translateY(0);
+        animation: logo-enter 0.5s 0.2s
+          var(--md-sys-motion-easing-emphasized-decelerate) both;
+      }
+
+      .app-logo svg {
+        width: 42px;
+        height: 42px;
+        fill: var(--md-sys-color-primary);
+      }
+
+      /* App name */
+      .app-name {
+        font: var(--md-sys-typescale-headline-medium-font);
+        color: var(--md-sys-color-on-surface);
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+        font-weight: 600;
+      }
+
+      .app-tagline {
+        font: var(--md-sys-typescale-body-medium-font);
+        color: var(--md-sys-color-on-surface-variant);
+        font-weight: 400;
+        letter-spacing: 0.25px;
+        margin-bottom: 48px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Progress section */
+      .progress-container {
+        margin: 32px 0 40px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .progress-label {
+        font: var(--md-sys-typescale-label-medium-font);
+        color: var(--md-sys-color-on-surface-variant);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .progress-percent {
+        font: var(--md-sys-typescale-title-small-font);
+        color: var(--md-sys-color-primary);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: var(--md-sys-color-surface-variant);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(
+          90deg,
+          var(--md-sys-color-primary),
+          var(--md-sys-color-primary-container)
+        );
+        border-radius: 4px;
+        transition: width 0.4s var(--md-sys-motion-easing-standard);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-fill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        animation: shimmer 2s infinite;
+      }
+
+      /* Status */
+      .status-container {
+        margin: 24px 0;
+        min-height: 24px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .status-message {
+        font: var(--md-sys-typescale-body-medium-font);
+        font-weight: 500;
+        color: var(--md-sys-color-on-surface);
+        opacity: 0.9;
+        transition: all 0.3s var(--md-sys-motion-easing-standard);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      /* Loading dots with Material Design style */
+      .loading-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin: 32px 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        background: var(--md-sys-color-primary);
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: pulse 1.5s infinite var(--md-sys-motion-easing-standard);
+      }
+
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      /* Migration info card */
+      .migration-info {
+        background: var(--md-sys-color-primary-container);
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 32px;
+        display: none;
+        position: relative;
+        z-index: 1;
+        box-shadow: var(--md-sys-elevation-level1);
+        border: none; /* Remove border */
+        transform: translateY(10px);
+        opacity: 0;
+        transition: all 0.3s var(--md-sys-motion-easing-standard);
+      }
+
+      .migration-info.visible {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .migration-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .migration-title {
+        font: var(--md-sys-typescale-title-small-font);
+        color: var(--md-sys-color-on-primary-container);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .migration-count {
+        font: var(--md-sys-typescale-title-medium-font);
+        font-weight: 700;
+        color: var(--md-sys-color-on-primary-container);
+        background: rgba(0, 106, 106, 0.1);
+        padding: 4px 12px;
+        border-radius: 12px;
+        min-width: 36px;
+        text-align: center;
+      }
+
+      .migration-progress {
+        height: 4px;
+        background: rgba(0, 106, 106, 0.1);
+        border-radius: 2px;
+        margin-top: 12px;
+        overflow: hidden;
+      }
+
+      .migration-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--md-sys-color-primary);
+        transition: width 0.3s var(--md-sys-motion-easing-standard);
+      }
+
+      .migration-message {
+        font: var(--md-sys-typescale-body-small-font);
+        color: var(--md-sys-color-on-primary-container);
+        margin-top: 12px;
+        opacity: 0.8;
+      }
+
+      /* Footer */
+      .app-footer {
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid var(--md-sys-color-outline);
+        font: var(--md-sys-typescale-body-small-font);
+        color: var(--md-sys-color-on-surface-variant);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .app-version {
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        font-weight: 500;
+        background: var(--md-sys-color-surface-variant);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+      }
+
+      .app-copyright {
+        opacity: 0.8;
+      }
+
+      /* Success state */
+      .success .progress-fill {
+        background: linear-gradient(
+          90deg,
+          var(--md-sys-color-primary),
+          #10b981
+        );
+      }
+
+      .success .dot {
+        background: #10b981;
+        animation: none;
+        opacity: 1;
+      }
+
+      .success .status-message {
+        color: #10b981;
+        font-weight: 600;
+      }
+
+      /* Material Design "chip" for step indicators */
+      .step-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--md-sys-color-surface-variant);
+        padding: 8px 16px;
+        border-radius: 16px;
+        margin: 8px 0;
+        font: var(--md-sys-typescale-label-medium-font);
+        color: var(--md-sys-color-on-surface-variant);
+        transition: all 0.3s var(--md-sys-motion-easing-standard);
+      }
+
+      .step-indicator.active {
+        background: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+      }
+
+      /* Animations */
+      @keyframes container-enter {
+        from {
+          opacity: 0;
+          transform: translateY(40px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes logo-enter {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(0.9);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      @keyframes fade-in-up {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .app-container {
+          max-width: 360px;
+          padding: 48px 28px 32px;
+          border-radius: 24px;
+          margin: 16px;
+        }
+
+        .app-container::before {
+          height: 140px;
+        }
+
+        .app-logo {
+          width: 72px;
+          height: 72px;
+          border-radius: 20px;
+          margin-bottom: 24px;
+        }
+
+        .app-logo svg {
+          width: 36px;
+          height: 36px;
+        }
+
+        .app-name {
+          font: var(--md-sys-typescale-headline-small-font);
+        }
+
+        .app-tagline {
+          font: var(--md-sys-typescale-body-small-font);
+          margin-bottom: 40px;
+        }
+
+        .app-footer {
+          flex-direction: column;
+          gap: 12px;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .app-container {
+          padding: 40px 24px 28px;
+        }
+
+        .app-logo {
+          width: 64px;
+          height: 64px;
+          border-radius: 18px;
+        }
+
+        .app-logo svg {
+          width: 32px;
+          height: 32px;
+        }
+      }
+
+      /* Step indicators container */
+      .step-indicators {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 24px 0;
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      /* Custom scrollbar for step indicators */
+      .step-indicators::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .step-indicators::-webkit-scrollbar-track {
+        background: var(--md-sys-color-surface-variant);
+        border-radius: 2px;
+      }
+
+      .step-indicators::-webkit-scrollbar-thumb {
+        background: var(--md-sys-color-primary);
+        border-radius: 2px;
+      }
+
+      /* Icon styles */
+      .icon {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        stroke-width: 0;
+        stroke: currentColor;
+        fill: currentColor;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container" id="appContainer">
+      <!-- App Logo -->
+      <div class="app-logo" id="appLogo">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6" />
+        </svg>
+      </div>
+
+      <!-- App Name -->
+      <h1 class="app-name">PayTrack Lite</h1>
+      <div class="app-tagline">Payroll & Attendance Management</div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-header">
+          <span class="progress-label">Initializing</span>
+          <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <!-- Status Message -->
+      <div class="status-container">
+        <div class="status-message" id="statusMessage">
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            style="fill: currentColor"
+          >
+            <path
+              d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"
+            />
+          </svg>
+          <span>Loading application...</span>
+        </div>
+      </div>
+
+      <!-- Loading Dots -->
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+      <!-- Step Indicators -->
+      <div class="step-indicators" id="stepIndicators">
+        <!-- Steps will be dynamically added here -->
+      </div>
+
+      <!-- Migration Info -->
+      <div class="migration-info" id="migrationInfo">
+        <div class="migration-header">
+          <div class="migration-title">
+            <svg
+              viewBox="0 0 24 24"
+              width="16"
+              height="16"
+              style="fill: currentColor"
+            >
+              <path
+                d="M4 7v10c0 1.1.9 2 2 2h10.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H6c-.6 0-1-.4-1-1V7c0-.3.2-.5.5-.5s.5.2.5.5v10.5c0 .3.2.5.5.5s.5-.2.5-.5V6.5c0-.3.2-.5.5-.5s.5.2.5.5V17c0 1.1.9 2 2 2h4.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H10c-.6 0-1-.4-1-1V6.5c0-.3.2-.5.5-.5s.5.2.5.5V15c0 1.1.9 2 2 2h4.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H13c-.6 0-1-.4-1-1V6.5c0-.3.2-.5.5-.5s.5.2.5.5V13c0 1.1.9 2 2 2h2.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H16c-.6 0-1-.4-1-1V6.5c0-.3.2-.5.5-.5s.5.2.5.5"
+              />
+            </svg>
+            Database Update
+          </div>
+          <div class="migration-count" id="migrationCount">0</div>
+        </div>
+        <div class="migration-progress">
+          <div class="migration-fill" id="migrationFill"></div>
+        </div>
+        <div class="migration-message" id="migrationMessage">
+          Preparing database...
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="app-footer">
+        <div class="app-version" id="appVersion">v1.0.0</div>
+        <div class="app-copyright">© 2026 CyberArcenal</div>
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const appContainer = document.getElementById("appContainer");
+      const progressFill = document.getElementById("progressFill");
+      const progressPercent = document.getElementById("progressPercent");
+      const statusMessage = document.getElementById("statusMessage");
+      const migrationInfo = document.getElementById("migrationInfo");
+      const migrationCount = document.getElementById("migrationCount");
+      const migrationFill = document.getElementById("migrationFill");
+      const migrationMessage = document.getElementById("migrationMessage");
+      const appVersion = document.getElementById("appVersion");
+      const stepIndicators = document.getElementById("stepIndicators");
+
+      // State
+      let progress = 0;
+      let isReady = false;
+      let currentStep = 0;
+
+      // Steps for loading with SVG icons
+      const loadingSteps = [
+        {
+          percent: 10,
+          message: "Loading core modules...",
+          icon: "M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83",
+        },
+        {
+          percent: 25,
+          message: "Initializing database...",
+          icon: "M4 7v10c0 1.1.9 2 2 2h10.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H6c-.6 0-1-.4-1-1V7c0-.3.2-.5.5-.5s.5.2.5.5v10.5c0 .3.2.5.5.5s.5-.2.5-.5V6.5c0-.3.2-.5.5-.5s.5.2.5.5V17c0 1.1.9 2 2 2h4.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H10c-.6 0-1-.4-1-1V6.5c0-.3.2-.5.5-.5s.5.2.5.5V15c0 1.1.9 2 2 2h4.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H13c-.6 0-1-.4-1-1V6.5c0-.3.2-.5.5-.5s.5.2.5.5V13c0 1.1.9 2 2 2h2.5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5H16c-.6 0-1-.4-1-1V6.5c0-.3.2-.5.5-.5s.5.2.5.5",
+        },
+        {
+          percent: 40,
+          message: "Setting up payroll engine...",
+          icon: "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
+        },
+        {
+          percent: 55,
+          message: "Loading attendance module...",
+          icon: "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z",
+        },
+        {
+          percent: 70,
+          message: "Preparing user interface...",
+          icon: "M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm16 14H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z",
+        },
+        {
+          percent: 85,
+          message: "Finalizing startup...",
+          icon: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z",
+        },
+      ];
+
+      // SVG icon for success
+      const successIcon =
+        "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z";
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        // Add step indicators to the UI
+        loadingSteps.forEach((step, index) => {
+          const stepEl = document.createElement("div");
+          stepEl.className = "step-indicator";
+          stepEl.id = `step-${index}`;
+          stepEl.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16" style="fill: currentColor;">
+              <path d="${step.icon}"/>
+            </svg>
+            <span>${step.message}</span>
+          `;
+          stepIndicators.appendChild(stepEl);
+        });
+
+        startLoadingSequence();
+        requestAppInfo();
+
+        // Add a subtle floating animation to the logo
+        const logo = document.querySelector(".app-logo");
+        let floatDirection = 1;
+        setInterval(() => {
+          const currentY =
+            parseFloat(getComputedStyle(logo).transform.split(",")[5]) || 0;
+          if (Math.abs(currentY) > 2) floatDirection *= -1;
+          logo.style.transform = `translateY(${currentY + 0.1 * floatDirection}px)`;
+        }, 100);
+      });
+
+      // Start loading sequence
+      function startLoadingSequence() {
+        function nextStep() {
+          if (currentStep >= loadingSteps.length || isReady) return;
+
+          const step = loadingSteps[currentStep];
+          progress = step.percent;
+
+          updateProgress(progress);
+          statusMessage.innerHTML = `
+            <svg viewBox="0 0 24 24" width="18" height="18" style="fill: currentColor;">
+              <path d="${step.icon}"/>
+            </svg>
+            <span>${step.message}</span>
+          `;
+
+          // Update step indicator
+          document.querySelectorAll(".step-indicator").forEach((el, index) => {
+            if (index <= currentStep) {
+              el.classList.add("active");
+            } else {
+              el.classList.remove("active");
+            }
+          });
+
+          currentStep++;
+
+          // Schedule next step
+          const delay = currentStep < 3 ? 500 : 700;
+          setTimeout(nextStep, delay);
+        }
+
+        // Start first step after a brief delay
+        setTimeout(nextStep, 400);
+      }
+
+      // Update progress
+      function updateProgress(percent) {
+        const rounded = Math.round(percent);
+        progressFill.style.width = `${rounded}%`;
+        progressPercent.textContent = `${rounded}%`;
+
+        // Add a subtle pulse animation when progress updates
+        progressFill.style.animation = "none";
+        setTimeout(() => {
+          progressFill.style.animation = "";
+        }, 10);
+      }
+
+      // IPC Event Handlers
+      if (window.electronAPI) {
+        // App ready
+        window.electronAPI.onAppReady((data) => {
+          isReady = true;
+
+          setTimeout(() => {
+            progress = 100;
+            updateProgress(progress);
+
+            // Mark all steps as completed
+            document.querySelectorAll(".step-indicator").forEach((el) => {
+              el.classList.add("active");
+              el.innerHTML = `
+                <svg viewBox="0 0 24 24" width="16" height="16" style="fill: #10b981;">
+                  <path d="${successIcon}"/>
+                </svg>
+                <span>${el.querySelector("span").textContent}</span>
+              `;
+            });
+
+            statusMessage.innerHTML = `
+              <span style="display: inline-flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" style="fill: #10b981;">
+                  <path d="${successIcon}"/>
+                </svg>
+                <span>Ready! Launching PayTrack Lite...</span>
+              </span>
+            `;
+            appContainer.classList.add("success");
+
+            // Add confetti effect
+            createConfetti();
+          }, 300);
+
+          if (data?.version) {
+            appVersion.textContent = `v${data.version}`;
+          }
+        });
+
+        // Migration events
+        window.electronAPI.onMigrationStart((data) => {
+          migrationInfo.classList.add("visible");
+          migrationCount.textContent = data.pendingCount || "0";
+          migrationMessage.textContent = data.message || "Updating database...";
+        });
+
+        window.electronAPI.onMigrationProgress((data) => {
+          const { current, total } = data;
+          const percent = total > 0 ? (current / total) * 100 : 0;
+          migrationFill.style.width = `${percent}%`;
+          migrationCount.textContent = current;
+          migrationMessage.textContent = `Migration ${current} of ${total}`;
+        });
+
+        window.electronAPI.onMigrationComplete((data) => {
+          migrationFill.style.width = "100%";
+          migrationMessage.textContent =
+            data.message || "Database updated successfully";
+          migrationMessage.style.color = "#10b981";
+
+          setTimeout(() => {
+            migrationInfo.style.opacity = "0";
+            migrationInfo.style.transform = "translateY(-10px)";
+            setTimeout(() => {
+              migrationInfo.style.display = "none";
+            }, 300);
+          }, 1000);
+        });
+
+        window.electronAPI.onMigrationFailed((data) => {
+          migrationInfo.style.borderColor = "#BA1A1A";
+          migrationInfo.style.background =
+            "var(--md-sys-color-error-container)";
+          migrationMessage.textContent = data.message || "Migration failed";
+          migrationMessage.style.color = "#BA1A1A";
+        });
+      } else {
+        // Simulation mode
+        console.log("Running in simulation mode");
+
+        // Simulate migration
+        setTimeout(() => {
+          simulateMigration();
+        }, 2000);
+
+        // Simulate app ready
+        setTimeout(() => {
+          isReady = true;
+          progress = 100;
+          updateProgress(progress);
+
+          // Mark all steps as completed
+          document.querySelectorAll(".step-indicator").forEach((el) => {
+            el.classList.add("active");
+            el.innerHTML = `
+              <svg viewBox="0 0 24 24" width="16" height="16" style="fill: #10b981;">
+                <path d="${successIcon}"/>
+              </svg>
+              <span>${el.querySelector("span").textContent}</span>
+            `;
+          });
+
+          statusMessage.innerHTML = `
+            <span style="display: inline-flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="18" height="18" style="fill: #10b981;">
+                <path d="${successIcon}"/>
+              </svg>
+              <span>PayTrack Lite Ready</span>
+            </span>
+          `;
+          appContainer.classList.add("success");
+          appVersion.textContent = "v1.2.0";
+
+          // Add confetti effect
+          createConfetti();
+        }, 5500);
+      }
+
+      // Request app info
+      function requestAppInfo() {
+        if (window.electronAPI?.getAppInfo) {
+          window.electronAPI
+            .getAppInfo()
+            .then((info) => {
+              if (info?.version) {
+                appVersion.textContent = `v${info.version}`;
+              }
+            })
+            .catch(() => {
+              appVersion.textContent = "v1.0.0";
+            });
+        }
+      }
+
+      // Simulate migration
+      function simulateMigration() {
+        migrationInfo.classList.add("visible");
+        migrationCount.textContent = "3";
+        migrationMessage.textContent = "Updating database...";
+
+        let current = 0;
+        const total = 3;
+
+        const interval = setInterval(() => {
+          current++;
+          const percent = (current / total) * 100;
+          migrationFill.style.width = `${percent}%`;
+          migrationCount.textContent = current;
+          migrationMessage.textContent = `Migration ${current}/${total}`;
+
+          if (current >= total) {
+            clearInterval(interval);
+            setTimeout(() => {
+              migrationMessage.textContent = "Database updated successfully";
+              migrationMessage.style.color = "#10b981";
+
+              setTimeout(() => {
+                migrationInfo.style.opacity = "0";
+                migrationInfo.style.transform = "translateY(-10px)";
+                setTimeout(() => {
+                  migrationInfo.style.display = "none";
+                }, 300);
+              }, 800);
+            }, 300);
+          }
+        }, 800);
+      }
+
+      // Create confetti effect for success
+      function createConfetti() {
+        const colors = ["#006A6A", "#10b981", "#4A6363", "#6FF7F6", "#D2E4FF"];
+
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement("div");
+          confetti.style.position = "absolute";
+          confetti.style.width = "8px";
+          confetti.style.height = "8px";
+          confetti.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.borderRadius = "50%";
+          confetti.style.top = "50%";
+          confetti.style.left = "50%";
+          confetti.style.opacity = "0";
+          confetti.style.transform = `translate(-50%, -50%) scale(0)`;
+          confetti.style.zIndex = "1000";
+          appContainer.appendChild(confetti);
+
+          // Animate confetti
+          const angle = Math.random() * Math.PI * 2;
+          const velocity = 2 + Math.random() * 2;
+          const x = Math.cos(angle) * velocity * 100;
+          const y = Math.sin(angle) * velocity * 100;
+
+          const animation = confetti.animate(
+            [
+              {
+                opacity: 0,
+                transform: `translate(-50%, -50%) scale(0) rotate(0deg)`,
+              },
+              {
+                opacity: 1,
+                transform: `translate(${x}px, ${y}px) scale(1) rotate(180deg)`,
+              },
+              {
+                opacity: 0,
+                transform: `translate(${x * 1.2}px, ${y * 1.2}px) scale(0) rotate(360deg)`,
+              },
+            ],
+            {
+              duration: 1000 + Math.random() * 500,
+              easing: "cubic-bezier(0.2, 0, 0, 1)",
+            },
+          );
+
+          animation.onfinish = () => confetti.remove();
+        }
+      }
+
+      // Prevent context menu
+      document.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+      });
+    </script>
+  </body>
+</html>

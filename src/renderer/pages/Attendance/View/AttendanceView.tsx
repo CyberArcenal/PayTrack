@@ -1,0 +1,1 @@
+// AttendanceView.tsx placeholder

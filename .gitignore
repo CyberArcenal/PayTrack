@@ -1,0 +1,6 @@
+node_modules
+*.ps1
+*.db
+*.db-wal
+*.db-shm
+src/config/env.js

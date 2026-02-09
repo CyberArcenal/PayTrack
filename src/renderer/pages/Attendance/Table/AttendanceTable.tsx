@@ -1,0 +1,1 @@
+// AttendanceTable.tsx placeholder

@@ -1,0 +1,1 @@
+// log.ipc.js placeholder

@@ -1,0 +1,1 @@
+// PayrollSummary.tsx placeholder

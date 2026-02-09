@@ -1,0 +1,1 @@
+// PayrollView.tsx placeholder

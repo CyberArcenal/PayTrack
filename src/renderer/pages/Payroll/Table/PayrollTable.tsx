@@ -1,0 +1,1 @@
+// PayrollTable.tsx placeholder

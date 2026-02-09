@@ -1,0 +1,1 @@
+// useAttendance.ts placeholder
