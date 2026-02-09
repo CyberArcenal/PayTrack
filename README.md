@@ -58,6 +58,90 @@ npm install
 npm run dev
 ```
 
+## System Structure
+
+```
+src/
+  main/
+    index.js
+    preload.js
+    ipc/
+      employee/
+        index.ipc.js
+        create.ipc.js
+        update.ipc.js
+        delete.ipc.js
+        list.ipc.js
+      attendance/
+        index.ipc.js
+        log.ipc.js
+        update.ipc.js
+        list.ipc.js
+      payroll/
+        index.ipc.js
+        compute.ipc.js
+        export.ipc.js
+    db/
+      database.js
+      datasource.js
+    config/
+      env.js
+
+  renderer/
+    App.tsx
+    main.tsx
+    api/
+      employee.ts
+      attendance.ts
+      payroll.ts
+    components/
+      EmployeeList.tsx
+      AttendanceForm.tsx
+      PayrollSummary.tsx
+    pages/
+      Employee/
+        Table/EmployeeTable.tsx
+        View/EmployeeView.tsx
+        Form/EmployeeForm.tsx
+      Attendance/
+        Table/AttendanceTable.tsx
+        View/AttendanceView.tsx
+        Form/AttendanceForm.tsx
+      Payroll/
+        Table/PayrollTable.tsx
+        View/PayrollView.tsx
+        Form/PayrollForm.tsx
+    hooks/
+      useIPC.ts
+      useEmployee.ts
+      useAttendance.ts
+    services/
+      employeeService.ts
+      attendanceService.ts
+      payrollService.ts
+    styles/
+      index.css
+
+  entities/
+    Employee.js
+    AttendanceLog.js
+    PayrollPeriod.js
+    PayrollRecord.js
+    Deduction.js
+    OvertimeLog.js
+    AuditLog.js
+
+  migrations/
+    2026XXXX-init-paytrack-schema.js
+
+  utils/
+    dateUtils.js
+    validation.js
+
+  middlewares/
+    errorHandler.js
+```
+
 ---
 
 ## 🏷️ Tagline
