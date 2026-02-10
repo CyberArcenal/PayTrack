@@ -2,7 +2,7 @@
 // src/entities/OvertimeLog.js
 const { EntitySchema } = require("typeorm");
 
-const OvertimeLogSchema = new EntitySchema({
+const OvertimeLog = new EntitySchema({
   name: "OvertimeLog",
   tableName: "overtime_logs",
   columns: {
@@ -145,4 +145,4 @@ const OvertimeLogSchema = new EntitySchema({
   ],
 });
 
-module.exports = OvertimeLogSchema;
+module.exports = OvertimeLog;

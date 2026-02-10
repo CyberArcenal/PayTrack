@@ -2,7 +2,7 @@
 // src/entities/Deduction.js
 const { EntitySchema } = require("typeorm");
 
-const DeductionSchema = new EntitySchema({
+const Deduction = new EntitySchema({
   name: "Deduction",
   tableName: "deductions",
   columns: {
@@ -110,4 +110,4 @@ const DeductionSchema = new EntitySchema({
   ],
 });
 
-module.exports = DeductionSchema;
+module.exports = Deduction;

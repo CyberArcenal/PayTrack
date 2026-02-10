@@ -3,7 +3,7 @@
 // @ts-check
 const { EntitySchema } = require("typeorm");
 
-const AuditLogSchema = new EntitySchema({
+const AuditLog = new EntitySchema({
   name: "AuditLog",
   tableName: "audit_logs",
   columns: {
@@ -98,4 +98,4 @@ const AuditLogSchema = new EntitySchema({
   ],
 });
 
-module.exports = AuditLogSchema;
+module.exports = AuditLog;

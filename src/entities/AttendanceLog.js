@@ -2,7 +2,7 @@
 // src/entities/AttendanceLog.js
 const { EntitySchema } = require("typeorm");
 
-const AttendanceLogSchema = new EntitySchema({
+const AttendanceLog = new EntitySchema({
   name: "AttendanceLog",
   tableName: "attendance_logs",
   columns: {
@@ -125,4 +125,4 @@ const AttendanceLogSchema = new EntitySchema({
   ],
 });
 
-module.exports = AttendanceLogSchema;
+module.exports = AttendanceLog;

@@ -1,7 +1,7 @@
 // src/entities/PayrollRecord.js
 const { EntitySchema } = require("typeorm");
 
-const PayrollRecordSchema = new EntitySchema({
+const PayrollRecord = new EntitySchema({
   name: "PayrollRecord",
   tableName: "payroll_records",
   columns: {
@@ -329,4 +329,4 @@ const PayrollRecordSchema = new EntitySchema({
   ],
 });
 
-module.exports = PayrollRecordSchema;
+module.exports = PayrollRecord;

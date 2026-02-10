@@ -2,9 +2,9 @@
 // src/ipc/handlers/dashboard.ipc.js - Dashboard Management Handler
 // @ts-check
 const { ipcMain } = require("electron");
-const { withErrorHandling } = require("../../../utils/errorHandler");
 const { logger } = require("../../../utils/logger");
 const { AppDataSource } = require("../../db/datasource");
+const { withErrorHandling } = require("../../../middlewares/errorHandler");
 
 class DashboardHandler {
   constructor() {

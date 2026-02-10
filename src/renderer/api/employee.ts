@@ -1152,26 +1152,6 @@ class EmployeeAPI {
     }
   }
 
-  // 🎯 EVENT LISTENERS (if available in your Electron setup)
-
-  onEmployeeCreated(callback: (employee: Employee) => void) {
-    if (window.backendAPI && window.backendAPI.onEmployeeCreated) {
-      window.backendAPI.onEmployeeCreated(callback);
-    }
-  }
-
-  onEmployeeUpdated(callback: (employee: Employee) => void) {
-    if (window.backendAPI && window.backendAPI.onEmployeeUpdated) {
-      window.backendAPI.onEmployeeUpdated(callback);
-    }
-  }
-
-  onEmployeeDeleted(callback: (employeeId: number) => void) {
-    if (window.backendAPI && window.backendAPI.onEmployeeDeleted) {
-      window.backendAPI.onEmployeeDeleted(callback);
-    }
-  }
-
   // 🎲 HELPER METHODS
 
   formatEmployeeName(employee: Employee): string {
@@ -1220,21 +1200,6 @@ class EmployeeAPI {
       'probationary': 'Probationary'
     };
     return labels[type] || type;
-  }
-}
-
-// Extend Window interface for TypeScript
-declare global {
-  interface Window {
-    backendAPI: {
-      employee: (payload: EmployeePayload) => Promise<BaseResponse>;
-      onEmployeeCreated?: (callback: (employee: Employee) => void) => void;
-      onEmployeeUpdated?: (callback: (employee: Employee) => void) => void;
-      onEmployeeDeleted?: (callback: (employeeId: number) => void) => void;
-      activation?: (payload: any) => Promise<any>;
-      onActivationCompleted?: (callback: (data: any) => void) => void;
-      onActivationDeactivated?: (callback: () => void) => void;
-    };
   }
 }
 

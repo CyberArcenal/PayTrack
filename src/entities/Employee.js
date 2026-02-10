@@ -1,7 +1,7 @@
 // src/entities/Employee.js
 const { EntitySchema } = require("typeorm");
 
-const EmployeeSchema = new EntitySchema({
+const Employee = new EntitySchema({
   name: "Employee",
   tableName: "employees",
   columns: {
@@ -221,4 +221,4 @@ const EmployeeSchema = new EntitySchema({
   ],
 });
 
-module.exports = EmployeeSchema;
+module.exports = Employee;

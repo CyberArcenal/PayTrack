@@ -10,8 +10,8 @@ declare global {
       deduction: (payload: any) => Promise<any>;
       employee: (payload: any) => Promise<any>;
       overtime: (payload: any) => Promise<any>;
-      payroll: (payload: any) => Promise<any>;
-      record: (payload: any) => Promise<any>;
+      payrollPeriod: (payload: any) => Promise<any>;
+      payrollRecord: (payload: any) => Promise<any>;
       
       // Events
       onActivationCompleted: (callback: (data: any) => void) => void;

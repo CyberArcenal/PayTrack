@@ -839,12 +839,17 @@ function registerIpcHandlers() {
   // Import modular IPC handlers
   try {
     const ipcModules = [
-      "./ipc/activation.ipc",
-      "./ipc/audit/index.ipc",
-      "./ipc/dashboard/index.ipc",
-      "./ipc/system_config.ipc",
-      "./ipc/windows_control.ipc",
-      "./ipc/attendance/index.ipc",
+      "./ipc/attendance/index.ipc.js",
+      "./ipc/deduction/index.ipc.js",
+      "./ipc/employee/index.ipc.js",
+      "./ipc/overtime/index.ipc.js",
+      "./ipc/payroll/index.ipc.js",
+      "./ipc/record/index.ipc.js",
+      "./ipc/activation.ipc.js",
+      "./ipc/audit/index.ipc.js",
+      "./ipc/dashboard/index.ipc.js",
+      "./ipc/system_config.ipc.js",
+      "./ipc/windows_control.ipc.js",
     ];
 
     ipcModules.forEach((modulePath) => {
