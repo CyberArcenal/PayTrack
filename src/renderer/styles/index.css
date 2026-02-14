@@ -1,1 +1,78 @@
-// index.css placeholder
+/* HR BOOKING MANAGEMENT THEME */
+@import "tailwindcss";
+
+:root {
+  --background-color: #0a0a0a; /* even darker than before */
+
+  /* Primary Color Palette - Elegant & Premium */
+  --primary-color: #d4af37; /* Gold */
+  --primary-hover: #b8860b; /* Darker Gold */
+  --secondary-color: #000000; /* Black */
+  --accent-color: #ffffff; /* White */
+
+  /* Suggested Professional Theme Additions */
+  --brand-navy: #1e3a8a; /* Corporate Navy Blue */
+  --brand-teal: #14b8a6; /* Modern Teal Accent */
+  --brand-sky: #3b82f6; /* Sky Blue highlight */
+
+  /* Background Colors */
+  --sidebar-bg: #1a1a1a;
+  --sidebar-border: #333333;
+  --sidebar-text: #f5f5f5;
+  --header-bg: var(--brand-navy);
+
+  /* Text Colors */
+  --text-primary: #f5f5f5;
+  --text-secondary: #cccccc;
+  --text-tertiary: #999999;
+
+  /* Card Backgrounds */
+  --card-bg: #1a1a1a;
+  --card-secondary-bg: #2a2a2a;
+  --card-hover-bg: #333333;
+
+  /* Border Colors */
+  --border-color: var(--primary-color);
+  --border-light: #e6c85f;
+
+  /* Status Colors for Booking */
+  --status-booked: var(--primary-color);
+  --status-confirmed: var(--primary-color);
+  --status-pending: #f0c420;
+  --status-cancelled: #ff4c4c;
+  --status-completed: #ffffff;
+  --status-available: var(--brand-teal);
+  --status-conflict: #ff6b6b;
+
+  /* Room/Resource Status */
+  --status-occupied: #ff4c4c;
+  --status-available-room: var(--brand-teal);
+  --status-maintenance: #f0c420;
+
+  /* Button Colors */
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-hover: var(--primary-hover);
+  --btn-primary-text: var(--accent-color);
+
+  --btn-confirm-bg: var(--brand-teal);
+  --btn-confirm-hover: #22c55e;
+  --btn-confirm-text: #000000;
+
+  --btn-cancel-bg: #ff4c4c;
+  --btn-cancel-hover: #dc2626;
+  --btn-cancel-text: #ffffff;
+
+  /* Calendar Specific */
+  --calendar-bg: var(--card-bg);
+  --calendar-header-bg: var(--brand-navy);
+  --calendar-today-bg: rgba(212, 175, 55, 0.2);
+  --calendar-selected-bg: var(--brand-teal);
+  --calendar-hover-bg: rgba(20, 184, 166, 0.1);
+  --calendar-border: var(--border-color);
+
+  /* Notification Colors */
+  --notification-upcoming: rgba(212, 175, 55, 0.1);
+  --notification-reminder: rgba(255, 255, 255, 0.1);
+  --notification-conflict: rgba(255, 76, 76, 0.1);
+  --notification-confirmation: rgba(20, 184, 166, 0.1);
+}

@@ -1,38 +1,35 @@
-// ===================== by_number.ipc.js =====================
+// @ts-check
+
+const Employee = require("../../../../entities/Employee");
 const { logger } = require("../../../../utils/logger");
 const { AppDataSource } = require("../../../db/datasource");
 
+
 /**
  * Get employee by employee number
- * @param {string} employeeNumber
- * @returns {Promise<{status: boolean, message: string, data: any}>}
+ * @param {Object} params - { employeeNumber }
+ * @returns {Promise<{status: boolean, message?: string, data?: any}>}
  */
-module.exports = async function getEmployeeByNumber(employeeNumber) {
+module.exports = async (params) => {
   try {
-    const employeeRepo = AppDataSource.getRepository("Employee");
-    const employee = await employeeRepo.findOne({
-      where: { employeeNumber },
-    });
-
-    if (!employee) {
-      return {
-        status: false,
-        message: `Employee with number ${employeeNumber} not found`,
-        data: null,
-      };
+    // @ts-ignore
+    if (!params.employeeNumber) {
+      return { status: false, message: "Employee number is required" };
     }
 
-    return {
-      status: true,
-      message: "Employee retrieved successfully",
-      data: employee,
-    };
+    const repo = AppDataSource.getRepository(Employee);
+    // @ts-ignore
+    const employee = await repo.findOne({ where: { employeeNumber: params.employeeNumber } });
+
+    if (!employee) {
+      return { status: false, message: "Employee not found" };
+    }
+
+    return { status: true, data: employee };
   } catch (error) {
+    // @ts-ignore
     logger.error("Error in getEmployeeByNumber:", error);
-    return {
-      status: false,
-      message: error.message || "Failed to retrieve employee",
-      data: null,
-    };
+    // @ts-ignore
+    return { status: false, message: error.message || "Failed to get employee by number" };
   }
 };

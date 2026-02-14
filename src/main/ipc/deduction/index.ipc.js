@@ -1,35 +1,33 @@
-// ===================== deduction.ipc.js =====================
-// src/ipc/handlers/deduction.ipc.js - Deduction Management Handler
+// src/main/ipc/deduction/index.ipc.js - Deduction Management Handler
 // @ts-check
 const { ipcMain } = require("electron");
 const { logger } = require("../../../utils/logger");
-const { AppDataSource } = require("../../db/datasource");
 const { withErrorHandling } = require("../../../middlewares/errorHandler");
 
 class DeductionHandler {
   constructor() {
-    // Initialize all handlers
     this.initializeHandlers();
   }
 
   initializeHandlers() {
-    // 📋 BASIC DEDUCTION OPERATIONS
+    // 📋 READ-ONLY HANDLERS
     this.getAllDeductions = this.importHandler("./get/all.ipc");
     this.getDeductionById = this.importHandler("./get/by_id.ipc");
-    this.getDeductionsByPayrollRecord = this.importHandler("./get/by_payroll_record.ipc");
+    this.getDeductionsByPayroll = this.importHandler("./get/by_payroll.ipc");
     this.getDeductionsByType = this.importHandler("./get/by_type.ipc");
-    this.getRecurringDeductions = this.importHandler("./get/recurring.ipc");
+    this.getDeductionStats = this.importHandler("./get/stats.ipc");
+    this.searchDeductions = this.importHandler("./search.ipc");
 
-    // ✏️ WRITE OPERATIONS
-    this.createDeduction = this.importHandler("./create.ipc.js");
-    this.updateDeduction = this.importHandler("./update/update.ipc.js");
-    this.deleteDeduction = this.importHandler("./delete/delete.ipc.js");
-    this.updateDeductionAmount = this.importHandler("./update_amount.ipc.js");
+    // ✏️ WRITE OPERATION HANDLERS
+    this.createDeduction = this.importHandler("./create.ipc");
+    this.updateDeduction = this.importHandler("./update.ipc");
+    this.deleteDeduction = this.importHandler("./delete.ipc");
+    this.bulkCreateDeductions = this.importHandler("./bulk_create.ipc");
+    this.bulkUpdateDeductions = this.importHandler("./bulk_update.ipc");
 
-    // ⚙️ VALIDATION & UTILITY HANDLERS
-    this.validateDeductionData = this.importHandler("./validation/validate_data.ipc.js");
-    this.checkDuplicateDeduction = this.importHandler("./check_duplicate.ipc.js");
-    this.getDeductionTypes = this.importHandler("./get_types.ipc.js");
+    // 📄 REPORT HANDLERS
+    this.exportDeductionsToCSV = this.importHandler("./export_csv.ipc");
+    this.generateDeductionReport = this.importHandler("./generate_report.ipc");
   }
 
   /**
@@ -37,7 +35,8 @@ class DeductionHandler {
    */
   importHandler(path) {
     try {
-      return require(path);
+      const fullPath = require.resolve(`./${path}`, { paths: [__dirname] });
+      return require(fullPath);
     } catch (error) {
       console.warn(
         `[DeductionHandler] Failed to load handler: ${path}`,
@@ -46,94 +45,52 @@ class DeductionHandler {
       );
       return async () => ({
         status: false,
-        message: `Handler not found: ${path}`,
+        message: `Handler not implemented: ${path}`,
         data: null,
       });
     }
   }
 
   /** @param {Electron.IpcMainInvokeEvent} event @param {{ method: any; params: {}; }} payload */
+  // @ts-ignore
   async handleRequest(event, payload) {
     try {
-      const method = payload.method;
-      const params = payload.params || {};
+      const { method, params = {} } = payload;
+      // @ts-ignore
+      logger.info(`DeductionHandler: ${method}`, { params });
 
-      // Log the request
-      if (logger) {
-        // @ts-ignore
-        logger.info(`DeductionHandler: ${method}`, { params });
-      }
-
-      // ROUTE REQUESTS
       switch (method) {
-        // 📋 BASIC OPERATIONS
+        // 📋 READ-ONLY
         case "getAllDeductions":
-          // @ts-ignore
-          return await this.getAllDeductions(params.filters);
-
+          return await this.getAllDeductions(params);
         case "getDeductionById":
-          // @ts-ignore
-          return await this.getDeductionById(params.id);
-
-        case "getDeductionsByPayrollRecord":
-          return await this.getDeductionsByPayrollRecord(
-            // @ts-ignore
-            params.payrollRecordId,
-            // @ts-ignore
-            params.filters,
-          );
-
+          return await this.getDeductionById(params);
+        case "getDeductionsByPayroll":
+          return await this.getDeductionsByPayroll(params);
         case "getDeductionsByType":
-          return await this.getDeductionsByType(
-            // @ts-ignore
-            params.type,
-            // @ts-ignore
-            params.filters,
-          );
+          return await this.getDeductionsByType(params);
+        case "getDeductionStats":
+          return await this.getDeductionStats(params);
+        case "searchDeductions":
+          return await this.searchDeductions(params);
 
-        case "getRecurringDeductions":
-          // @ts-ignore
-          return await this.getRecurringDeductions(params.filters);
-
-        // ✏️ WRITE OPERATIONS (with transactions)
+        // ✏️ WRITE
         case "createDeduction":
-          return await this.handleWithTransaction(
-            this.createDeduction,
-            // @ts-ignore
-            params,
-          );
-
+          return await this.createDeduction(params);
         case "updateDeduction":
-          return await this.handleWithTransaction(
-            this.updateDeduction,
-            // @ts-ignore
-            params,
-          );
-
+          return await this.updateDeduction(params);
         case "deleteDeduction":
-          return await this.handleWithTransaction(
-            this.deleteDeduction,
-            // @ts-ignore
-            params,
-          );
+          return await this.deleteDeduction(params);
+        case "bulkCreateDeductions":
+          return await this.bulkCreateDeductions(params);
+        case "bulkUpdateDeductions":
+          return await this.bulkUpdateDeductions(params);
 
-        case "updateDeductionAmount":
-          return await this.handleWithTransaction(
-            this.updateDeductionAmount,
-            // @ts-ignore
-            params,
-          );
-
-        // ⚙️ VALIDATION & UTILITY OPERATIONS
-        case "validateDeductionData":
-          return await this.validateDeductionData(params);
-
-        case "checkDuplicateDeduction":
-          return await this.checkDuplicateDeduction(params);
-
-        case "getDeductionTypes":
-          // @ts-ignore
-          return await this.getDeductionTypes(params.category);
+        // 📄 REPORT
+        case "exportDeductionsToCSV":
+          return await this.exportDeductionsToCSV(params);
+        case "generateDeductionReport":
+          return await this.generateDeductionReport(params);
 
         default:
           return {
@@ -143,11 +100,8 @@ class DeductionHandler {
           };
       }
     } catch (error) {
-      console.error("DeductionHandler error:", error);
-      if (logger) {
-        // @ts-ignore
-        logger.error("DeductionHandler error:", error);
-      }
+      // @ts-ignore
+      logger.error("DeductionHandler error:", error);
       return {
         status: false,
         // @ts-ignore
@@ -158,37 +112,38 @@ class DeductionHandler {
   }
 
   /**
-   * Wrap critical operations in a database transaction
-   * @param {(arg0: any, arg1: import("typeorm").QueryRunner) => any} handler
-   * @param {any} params
+   * Optional activity logger (gamit ang AuditLog entity)
+   * @param {number|string} userId
+   * @param {string} action
+   * @param {string} description
+   * @param {import("typeorm").QueryRunner} [qr]
    */
-  async handleWithTransaction(handler, params) {
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
+  // @ts-ignore
+  async logActivity(userId, action, description, qr = null) {
     try {
-      const result = await handler(params, queryRunner);
-
-      if (result.status) {
-        await queryRunner.commitTransaction();
-      } else {
-        await queryRunner.rollbackTransaction();
-      }
-
-      return result;
+      const { AuditLog } = require("../../../entities/AuditLog");
+      const { AppDataSource } = require("../../db/datasource");
+      const repo = qr
+        ? qr.manager.getRepository(AuditLog)
+        : AppDataSource.getRepository(AuditLog);
+      // @ts-ignore
+      const log = repo.create({
+        user: userId,
+        action,
+        description,
+        entity: "Deduction",
+        timestamp: new Date(),
+      });
+      await repo.save(log);
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
+      // @ts-ignore
+      logger.warn("Failed to log deduction activity:", error);
     }
   }
 }
 
 // Register IPC handler
 const deductionHandler = new DeductionHandler();
-
 ipcMain.handle(
   "deduction",
   withErrorHandling(

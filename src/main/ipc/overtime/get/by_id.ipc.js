@@ -1,51 +1,24 @@
-// src/ipc/handlers/overtime/get/by_id.ipc.js
-const { logger } = require("../../../../utils/logger");
-const { AppDataSource } = require("../../../db/datasource");
+const overtimeLogService = require("../../../../services/OvertimeLog");
 
 /**
- * Get overtime log by ID
- * @param {number} id
- * @returns {Promise<{status: boolean, message: string, data: any|null}>}
+ * Get a single overtime log by its ID.
+ * @param {Object} params - Request parameters.
+ * @param {number} params.id - Overtime log ID.
+ * @returns {Promise<{ success: boolean, message?: string, data?: any }>}
  */
-module.exports = async function getOvertimeLogById(id) {
+module.exports = async (params) => {
   try {
-    if (!id || typeof id !== "number" || id <= 0) {
-      return {
-        status: false,
-        message: "Invalid overtime log ID",
-        data: null,
-      };
+    const { id } = params;
+    if (typeof id !== 'number' && isNaN(parseInt(id))) {
+      throw new Error('Invalid or missing overtime log ID');
     }
-
-    const overtimeLogRepo = AppDataSource.getRepository("OvertimeLog");
-    
-    const overtimeLog = await overtimeLogRepo.findOne({
-      where: { id },
-      relations: ["employee", "payrollRecord"],
-    });
-
-    if (!overtimeLog) {
-      return {
-        status: false,
-        message: `Overtime log with ID ${id} not found`,
-        data: null,
-      };
-    }
-
-    logger.info(`Retrieved overtime log ID: ${id}`);
-
-    return {
-      status: true,
-      message: "Overtime log retrieved successfully",
-      data: overtimeLog,
-    };
+    const data = await overtimeLogService.findById(parseInt(id));
+    return { success: true, data };
   } catch (error) {
-    logger.error(`Error in getOvertimeLogById for ID ${id}:`, error);
-    
+    console.error('[get/by_id.ipc] Error:', error.message);
     return {
-      status: false,
-      message: error.message || "Failed to retrieve overtime log",
-      data: null,
+      success: false,
+      message: error.message || 'Failed to retrieve overtime log',
     };
   }
 };

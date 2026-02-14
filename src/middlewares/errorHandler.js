@@ -6,11 +6,11 @@ const { safeStringify } = require("../utils/logger");
 
 // Kung wala ang TransactionError, gumawa tayo ng fallback
 /**
- * @type {typeof import("../utils/transactionWrapper").TransactionError}
+ * @type {typeof import("../utils/dbUtils/transactionWrapper").TransactionError}
  */
 let TransactionError;
 try {
-  TransactionError = require("../utils/transactionWrapper").TransactionError;
+  TransactionError = require("../utils/dbUtils/transactionWrapper").TransactionError;
 } catch (err) {
   // Fallback class kung hindi available ang transactionWrapper
   // @ts-ignore

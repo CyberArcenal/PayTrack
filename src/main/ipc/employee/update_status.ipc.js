@@ -1,61 +1,31 @@
-// ===================== update_status.ipc.js =====================
+const employeeService = require("../../../services/Employee");
 const { logger } = require("../../../utils/logger");
-const { AppDataSource } = require("../../db/datasource");
+
 /**
  * Update employee status
- * @param {Object} statusData
- * @param {import("typeorm").QueryRunner} [queryRunner]
- * @returns {Promise<{status: boolean, message: string, data: any}>}
+ * @param {Object} params - { id, status, user? }
+ * @returns {Promise<{status: boolean, message?: string, data?: any}>}
  */
-module.exports = async function updateEmployeeStatus(statusData, queryRunner) {
-  const repo = queryRunner ? queryRunner.manager.getRepository("Employee") : AppDataSource.getRepository("Employee");
-
+module.exports = async (params) => {
   try {
-    const { id, status, userId, userType, reason } = statusData;
+    const { id, status, user = "system" } = params;
 
-    if (!id || !status) {
-      return {
-        status: false,
-        message: "Employee ID and status are required",
-        data: null,
-      };
+    if (!id || isNaN(Number(id))) {
+      return { status: false, message: "Valid employee ID is required" };
+    }
+    if (!status) {
+      return { status: false, message: "New status is required" };
     }
 
     const validStatuses = ["active", "inactive", "terminated", "on-leave"];
     if (!validStatuses.includes(status)) {
-      return {
-        status: false,
-        message: `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
-        data: null,
-      };
+      return { status: false, message: `Status must be one of: ${validStatuses.join(", ")}` };
     }
 
-    const employee = await repo.findOne({ where: { id } });
-    if (!employee) {
-      return {
-        status: false,
-        message: `Employee with ID ${id} not found`,
-        data: null,
-      };
-    }
-
-    const oldStatus = employee.status;
-    await repo.update(id, { status, updatedAt: new Date() });
-    const updatedEmployee = await repo.findOne({ where: { id } });
-
-    logger.info(`Employee status updated: ID ${id}, ${oldStatus} -> ${status}`);
-
-    return {
-      status: true,
-      message: "Employee status updated successfully",
-      data: updatedEmployee,
-    };
+    const updated = await employeeService.changeStatus(Number(id), status, user);
+    return { status: true, data: updated, message: `Employee status updated to ${status}` };
   } catch (error) {
     logger.error("Error in updateEmployeeStatus:", error);
-    return {
-      status: false,
-      message: error.message || "Failed to update employee status",
-      data: null,
-    };
+    return { status: false, message: error.message || "Failed to update employee status" };
   }
 };

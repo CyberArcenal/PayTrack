@@ -1,123 +1,56 @@
-// src/ipc/handlers/overtime/create.ipc.js
-const { logger } = require("../../../../utils/logger");
-const { AppDataSource } = require("../../../db/datasource");
-const validateOvertimeData = require("../validation/validate_data.ipc");
-const checkDuplicateOvertime = require("../check_duplicate.ipc");
-const checkOvertimeOverlap = require("../validation/check_overlap.ipc");
+const overtimeLogService = require("../../../services/OvertimeLog");
 
 /**
- * Create a new overtime log
- * @param {Object} overtimeData
- * @param {import("typeorm").QueryRunner} [queryRunner]
- * @returns {Promise<{status: boolean, message: string, data: any}>}
+ * Create a new overtime log.
+ * @param {Object} params - Request parameters.
+ * @param {number} params.employeeId - Employee ID.
+ * @param {string} params.date - Date (YYYY-MM-DD).
+ * @param {string} params.startTime - Start time (HH:MM:SS).
+ * @param {string} params.endTime - End time (HH:MM:SS).
+ * @param {string} [params.type] - Overtime type.
+ * @param {number} [params.rate] - Overtime multiplier.
+ * @param {string} [params.approvedBy] - Approver name.
+ * @param {string} [params.note] - Notes.
+ * @param {string} [params.user] - User performing the action.
+ * @returns {Promise<{ success: boolean, message?: string, data?: any }>}
  */
-module.exports = async function createOvertimeLog(overtimeData, queryRunner) {
-  const repo = queryRunner 
-    ? queryRunner.manager.getRepository("OvertimeLog") 
-    : AppDataSource.getRepository("OvertimeLog");
-  
-  const employeeRepo = queryRunner
-    ? queryRunner.manager.getRepository("Employee")
-    : AppDataSource.getRepository("Employee");
-
+module.exports = async (params) => {
   try {
-    // Validate input data
-    const validation = validateOvertimeData(overtimeData);
-    if (!validation.isValid) {
-      return {
-        status: false,
-        message: "Overtime data validation failed",
-        data: { errors: validation.errors },
-      };
+    const {
+      employeeId,
+      date,
+      startTime,
+      endTime,
+      type,
+      rate,
+      approvedBy,
+      note,
+      user = 'system',
+    } = params;
+
+    // Basic validation
+    if (!employeeId || !date || !startTime || !endTime) {
+      throw new Error('Missing required fields: employeeId, date, startTime, endTime');
     }
 
-    // Check if employee exists
-    const employee = await employeeRepo.findOne({ 
-      where: { id: overtimeData.employeeId } 
-    });
-
-    if (!employee) {
-      return {
-        status: false,
-        message: `Employee with ID ${overtimeData.employeeId} not found`,
-        data: null,
-      };
-    }
-
-    // Check for duplicate overtime
-    const duplicateCheck = await checkDuplicateOvertime(overtimeData);
-    if (duplicateCheck.isDuplicate) {
-      return {
-        status: false,
-        message: duplicateCheck.message,
-        data: null,
-      };
-    }
-
-    // Check for time overlap
-    const overlapCheck = await checkOvertimeOverlap(
-      overtimeData.employeeId,
-      overtimeData.date,
-      overtimeData.startTime,
-      overtimeData.endTime
-    );
-
-    if (overlapCheck.hasOverlap) {
-      return {
-        status: false,
-        message: overlapCheck.message,
-        data: { overlappingLogs: overlapCheck.overlappingLogs },
-      };
-    }
-
-    // Calculate overtime amount
-    const hourlyRate = employee.hourlyRate || 0;
-    const overtimeRate = overtimeData.rate || 1.25;
-    const hours = overtimeData.hours || 0;
-    const amount = hourlyRate * hours * overtimeRate;
-
-    // Prepare overtime log entity
-    const overtimeLog = repo.create({
-      employeeId: overtimeData.employeeId,
-      date: overtimeData.date,
-      startTime: overtimeData.startTime,
-      endTime: overtimeData.endTime,
-      hours: overtimeData.hours,
-      rate: overtimeData.rate || 1.25,
-      amount: overtimeData.amount || amount,
-      type: overtimeData.type || "regular",
-      approvedBy: overtimeData.approvedBy || null,
-      approvalStatus: overtimeData.approvalStatus || "pending",
-      note: overtimeData.note || null,
-      payrollRecordId: null, // Will be set when processed
-    });
-
-    // Save overtime log
-    const savedOvertimeLog = await repo.save(overtimeLog);
-
-    logger.info(`Overtime log created: ID ${savedOvertimeLog.id}, Employee: ${employeeId}, Date: ${date}`);
-
-    return {
-      status: true,
-      message: "Overtime log created successfully",
-      data: savedOvertimeLog,
+    const data = {
+      employeeId: parseInt(employeeId),
+      date,
+      startTime,
+      endTime,
+      type,
+      rate: rate !== undefined ? parseFloat(rate) : undefined,
+      approvedBy,
+      note,
     };
+
+    const result = await overtimeLogService.create(data, user);
+    return { success: true, data: result, message: 'Overtime log created successfully' };
   } catch (error) {
-    logger.error("Error in createOvertimeLog:", error);
-
-    let errorMessage = "Failed to create overtime log";
-    if (error.code === "SQLITE_CONSTRAINT") {
-      if (error.message.includes("FOREIGN KEY")) {
-        errorMessage = "Invalid employee ID";
-      } else if (error.message.includes("UNIQUE")) {
-        errorMessage = "Duplicate overtime record";
-      }
-    }
-
+    console.error('[create.ipc] Error:', error.message);
     return {
-      status: false,
-      message: errorMessage,
-      data: null,
+      success: false,
+      message: error.message || 'Failed to create overtime log',
     };
   }
 };

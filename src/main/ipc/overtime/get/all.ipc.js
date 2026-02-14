@@ -1,95 +1,53 @@
-// src/ipc/handlers/overtime/get/all.ipc.js
-const { logger } = require("../../../../utils/logger");
-const { AppDataSource } = require("../../../db/datasource");
+
+
+const overtimeLogService = require("../../../../services/OvertimeLog");
 
 /**
- * @typedef {Object} OvertimeFilters
- * @property {number} [employeeId]
- * @property {string} [dateFrom]
- * @property {string} [dateTo]
- * @property {string} [status]
- * @property {string} [type]
- * @property {number} [limit]
- * @property {number} [offset]
- * @property {string} [orderBy]
- * @property {'ASC'|'DESC'} [order]
+ * Get all overtime logs with optional filters and pagination.
+ * @param {Object} params - Request parameters.
+ * @param {number} [params.page] - Page number (1-based).
+ * @param {number} [params.limit] - Items per page.
+ * @param {number} [params.employeeId] - Filter by employee ID.
+ * @param {string} [params.startDate] - Filter by start date (YYYY-MM-DD).
+ * @param {string} [params.endDate] - Filter by end date (YYYY-MM-DD).
+ * @param {string} [params.type] - Filter by overtime type.
+ * @param {string} [params.approvalStatus] - Filter by approval status.
+ * @param {number} [params.payrollRecordId] - Filter by payroll record ID.
+ * @returns {Promise<{ success: boolean, message?: string, data?: any }>}
  */
-
-/**
- * Get all overtime logs with optional filters
- * @param {OvertimeFilters} [filters]
- * @returns {Promise<{status: boolean, message: string, data: any[]}>}
- */
-module.exports = async function getAllOvertimeLogs(filters = {}) {
+module.exports = async (params) => {
   try {
-    const overtimeLogRepo = AppDataSource.getRepository("OvertimeLog");
-    
-    const query = overtimeLogRepo.createQueryBuilder("overtime")
-      .leftJoinAndSelect("overtime.employee", "employee")
-      .leftJoinAndSelect("overtime.payrollRecord", "payrollRecord")
-      .where("1=1");
+    const {
+      page,
+      limit,
+      employeeId,
+      startDate,
+      endDate,
+      type,
+      approvalStatus,
+      payrollRecordId,
+    } = params;
 
-    // Apply filters
-    if (filters.employeeId) {
-      query.andWhere("overtime.employeeId = :employeeId", { employeeId: filters.employeeId });
+    // Build filters object, removing undefined values
+    const filters = {};
+    if (employeeId !== undefined) filters.employeeId = employeeId;
+    if (startDate !== undefined) filters.startDate = startDate;
+    if (endDate !== undefined) filters.endDate = endDate;
+    if (type !== undefined) filters.type = type;
+    if (approvalStatus !== undefined) filters.approvalStatus = approvalStatus;
+    if (payrollRecordId !== undefined) filters.payrollRecordId = payrollRecordId;
+    if (page !== undefined && limit !== undefined) {
+      filters.page = page;
+      filters.limit = limit;
     }
 
-    if (filters.status) {
-      query.andWhere("overtime.approvalStatus = :status", { status: filters.status });
-    }
-
-    if (filters.type) {
-      query.andWhere("overtime.type = :type", { type: filters.type });
-    }
-
-    if (filters.dateFrom && filters.dateTo) {
-      query.andWhere("overtime.date BETWEEN :dateFrom AND :dateTo", {
-        dateFrom: filters.dateFrom,
-        dateTo: filters.dateTo,
-      });
-    } else if (filters.dateFrom) {
-      query.andWhere("overtime.date >= :dateFrom", { dateFrom: filters.dateFrom });
-    } else if (filters.dateTo) {
-      query.andWhere("overtime.date <= :dateTo", { dateTo: filters.dateTo });
-    }
-
-    // Ordering
-    const orderBy = filters.orderBy || "overtime.date";
-    const order = filters.order || "DESC";
-    query.orderBy(orderBy, order);
-
-    // Pagination
-    if (filters.limit) {
-      query.limit(filters.limit);
-      if (filters.offset) {
-        query.offset(filters.offset);
-      }
-    }
-
-    const overtimeLogs = await query.getMany();
-    
-    // Calculate total for pagination
-    const total = await query.getCount();
-
-    logger.info(`Retrieved ${overtimeLogs.length} overtime logs`);
-
-    return {
-      status: true,
-      message: "Overtime logs retrieved successfully",
-      data: {
-        logs: overtimeLogs,
-        total,
-        limit: filters.limit || null,
-        offset: filters.offset || 0,
-      },
-    };
+    const data = await overtimeLogService.findAll(filters);
+    return { success: true, data };
   } catch (error) {
-    logger.error("Error in getAllOvertimeLogs:", error);
-    
+    console.error('[get/all.ipc] Error:', error.message);
     return {
-      status: false,
-      message: error.message || "Failed to retrieve overtime logs",
-      data: [],
+      success: false,
+      message: error.message || 'Failed to retrieve overtime logs',
     };
   }
 };

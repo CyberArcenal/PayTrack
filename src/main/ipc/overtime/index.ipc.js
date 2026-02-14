@@ -1,288 +1,99 @@
-// ===================== overtime.ipc.js =====================
-// src/ipc/handlers/overtime.ipc.js - Overtime Management Handler
+// src/main/ipc/overtime/index.ipc.js - Overtime Log Management Handler
 // @ts-check
 const { ipcMain } = require("electron");
 const { logger } = require("../../../utils/logger");
-const { AppDataSource } = require("../../db/datasource");
 const { withErrorHandling } = require("../../../middlewares/errorHandler");
 
 class OvertimeHandler {
   constructor() {
-    // Initialize all handlers
     this.initializeHandlers();
   }
 
   initializeHandlers() {
-    // 📋 BASIC OVERTIME OPERATIONS
-    this.getAllOvertimeLogs = this.importHandler("./get/all.ipc");
-    this.getOvertimeLogById = this.importHandler("./get/by_id.ipc");
-    this.getOvertimeLogsByEmployee = this.importHandler("./get/by_employee.ipc");
-    this.getOvertimeLogsByDate = this.importHandler("./get/by_date.ipc");
-    this.getOvertimeLogsByDateRange = this.importHandler("./get/by_date_range.ipc");
-    this.getOvertimeLogsByStatus = this.importHandler("./get/by_status.ipc");
-    this.getPendingOvertimeLogs = this.importHandler("./get/pending.ipc");
-    this.getApprovedOvertimeLogs = this.importHandler("./get/approved.ipc");
-    this.getRejectedOvertimeLogs = this.importHandler("./get/rejected.ipc");
+    // 📋 READ-ONLY HANDLERS
+    this.getAllOvertime = this.importHandler("./get/all.ipc");
+    this.getOvertimeById = this.importHandler("./get/by_id.ipc");
+    this.getOvertimeByEmployee = this.importHandler("./get/by_employee.ipc");
+    this.getOvertimeByPayroll = this.importHandler("./get/by_payroll.ipc");
+    this.getOvertimeByDate = this.importHandler("./get/by_date.ipc");
+    this.getOvertimeStats = this.importHandler("./get/stats.ipc");
+    this.searchOvertime = this.importHandler("./search.ipc");
 
-    // ✏️ WRITE OPERATIONS
-    this.createOvertimeLog = this.importHandler("./create.ipc.js");
-    this.updateOvertimeLog = this.importHandler("./update/update.ipc.js");
-    this.deleteOvertimeLog = this.importHandler("./delete/delete.ipc.js");
-    this.approveOvertime = this.importHandler("./approve.ipc.js");
-    this.rejectOvertime = this.importHandler("./reject.ipc.js");
-    this.updateOvertimeHours = this.importHandler("./update_hours.ipc.js");
-    this.updateOvertimeRate = this.importHandler("./update_rate.ipc.js");
-    this.recalculateOvertimeAmount = this.importHandler("./recalculate_amount.ipc.js");
+    // ✏️ WRITE OPERATION HANDLERS
+    this.createOvertime = this.importHandler("./create.ipc");
+    this.updateOvertime = this.importHandler("./update.ipc");
+    this.deleteOvertime = this.importHandler("./delete.ipc");
+    this.bulkCreateOvertime = this.importHandler("./bulk_create.ipc");
+    this.bulkUpdateOvertime = this.importHandler("./bulk_update.ipc");
+    this.approveOvertime = this.importHandler("./approve.ipc");
+    this.rejectOvertime = this.importHandler("./reject.ipc");
 
-    // 📊 BASIC REPORTS
-    this.getOvertimeReport = this.importHandler("./get/report.ipc");
-    this.getDailyOvertimeReport = this.importHandler("./get/daily_report.ipc");
-    this.getMonthlyOvertimeReport = this.importHandler("./get/monthly_report.ipc");
-
-    // ⏰ OVERTIME CALCULATION HANDLERS
-    this.calculateOvertimeHours = this.importHandler("./calculate/hours.ipc.js");
-    this.calculateOvertimeAmount = this.importHandler("./calculate/amount.ipc.js");
-    this.checkOvertimeOverlap = this.importHandler("./validation/check_overlap.ipc.js");
-
-    // ⚙️ UTILITY HANDLERS
-    this.validateOvertimeData = this.importHandler("./validation/validate_data.ipc.js");
-    this.checkDuplicateOvertime = this.importHandler("./check_duplicate.ipc.js");
-    this.getOvertimeTypes = this.importHandler("./get_types.ipc.js");
-    this.getOvertimeStatuses = this.importHandler("./get_statuses.ipc.js");
+    // 📄 REPORT HANDLERS
+    this.exportOvertimeToCSV = this.importHandler("./export_csv.ipc");
+    this.generateOvertimeReport = this.importHandler("./generate_report.ipc");
   }
 
-  /**
-   * @param {string} path
-   */
+  // @ts-ignore
   importHandler(path) {
     try {
-      return require(path);
+      const fullPath = require.resolve(`./${path}`, { paths: [__dirname] });
+      return require(fullPath);
     } catch (error) {
-      console.warn(
-        `[OvertimeHandler] Failed to load handler: ${path}`,
-        // @ts-ignore
-        error.message,
-      );
+      // @ts-ignore
+      console.warn(`[OvertimeHandler] Failed to load handler: ${path}`, error.message);
       return async () => ({
         status: false,
-        message: `Handler not found: ${path}`,
+        message: `Handler not implemented: ${path}`,
         data: null,
       });
     }
   }
 
-  /** @param {Electron.IpcMainInvokeEvent} event @param {{ method: any; params: {}; }} payload */
+  // @ts-ignore
   async handleRequest(event, payload) {
     try {
-      const method = payload.method;
-      const params = payload.params || {};
+      const { method, params = {} } = payload;
+      // @ts-ignore
+      logger.info(`OvertimeHandler: ${method}`, { params });
 
-      // Log the request
-      if (logger) {
-        // @ts-ignore
-        logger.info(`OvertimeHandler: ${method}`, { params });
-      }
-
-      // ROUTE REQUESTS
       switch (method) {
-        // 📋 BASIC OPERATIONS
-        case "getAllOvertimeLogs":
-          // @ts-ignore
-          return await this.getAllOvertimeLogs(params.filters);
+        // 📋 READ-ONLY
+        case "getAllOvertime":
+          return await this.getAllOvertime(params);
+        case "getOvertimeById":
+          return await this.getOvertimeById(params);
+        case "getOvertimeByEmployee":
+          return await this.getOvertimeByEmployee(params);
+        case "getOvertimeByPayroll":
+          return await this.getOvertimeByPayroll(params);
+        case "getOvertimeByDate":
+          return await this.getOvertimeByDate(params);
+        case "getOvertimeStats":
+          return await this.getOvertimeStats(params);
+        case "searchOvertime":
+          return await this.searchOvertime(params);
 
-        case "getOvertimeLogById":
-          // @ts-ignore
-          return await this.getOvertimeLogById(params.id);
-
-        case "getOvertimeLogsByEmployee":
-          return await this.getOvertimeLogsByEmployee(
-            // @ts-ignore
-            params.employeeId,
-            // @ts-ignore
-            params.dateRange,
-          );
-
-        case "getOvertimeLogsByDate":
-          return await this.getOvertimeLogsByDate(
-            // @ts-ignore
-            params.date,
-            // @ts-ignore
-            params.filters,
-          );
-
-        case "getOvertimeLogsByDateRange":
-          return await this.getOvertimeLogsByDateRange(
-            // @ts-ignore
-            params.startDate,
-            // @ts-ignore
-            params.endDate,
-            // @ts-ignore
-            params.filters,
-          );
-
-        case "getOvertimeLogsByStatus":
-          return await this.getOvertimeLogsByStatus(
-            // @ts-ignore
-            params.status,
-            // @ts-ignore
-            params.filters,
-          );
-
-        case "getPendingOvertimeLogs":
-          // @ts-ignore
-          return await this.getPendingOvertimeLogs(params.filters);
-
-        case "getApprovedOvertimeLogs":
-          return await this.getApprovedOvertimeLogs(
-            // @ts-ignore
-            params.dateRange,
-            // @ts-ignore
-            params.filters,
-          );
-
-        case "getRejectedOvertimeLogs":
-          return await this.getRejectedOvertimeLogs(
-            // @ts-ignore
-            params.dateRange,
-            // @ts-ignore
-            params.filters,
-          );
-
-        // ✏️ WRITE OPERATIONS (with transactions)
-        case "createOvertimeLog":
-          return await this.handleWithTransaction(
-            this.createOvertimeLog,
-            // @ts-ignore
-            params,
-          );
-
-        case "updateOvertimeLog":
-          return await this.handleWithTransaction(
-            this.updateOvertimeLog,
-            // @ts-ignore
-            params,
-          );
-
-        case "deleteOvertimeLog":
-          return await this.handleWithTransaction(
-            this.deleteOvertimeLog,
-            // @ts-ignore
-            params,
-          );
-
+        // ✏️ WRITE
+        case "createOvertime":
+          return await this.createOvertime(params);
+        case "updateOvertime":
+          return await this.updateOvertime(params);
+        case "deleteOvertime":
+          return await this.deleteOvertime(params);
+        case "bulkCreateOvertime":
+          return await this.bulkCreateOvertime(params);
+        case "bulkUpdateOvertime":
+          return await this.bulkUpdateOvertime(params);
         case "approveOvertime":
-          return await this.handleWithTransaction(
-            this.approveOvertime,
-            // @ts-ignore
-            params,
-          );
-
+          return await this.approveOvertime(params);
         case "rejectOvertime":
-          return await this.handleWithTransaction(
-            this.rejectOvertime,
-            // @ts-ignore
-            params,
-          );
+          return await this.rejectOvertime(params);
 
-        case "updateOvertimeHours":
-          return await this.handleWithTransaction(
-            this.updateOvertimeHours,
-            // @ts-ignore
-            params,
-          );
-
-        case "updateOvertimeRate":
-          return await this.handleWithTransaction(
-            this.updateOvertimeRate,
-            // @ts-ignore
-            params,
-          );
-
-        case "recalculateOvertimeAmount":
-          return await this.handleWithTransaction(
-            this.recalculateOvertimeAmount,
-            // @ts-ignore
-            params,
-          );
-
-        // 📊 REPORT OPERATIONS
-        case "getOvertimeReport":
-          return await this.getOvertimeReport(
-            // @ts-ignore
-            params.dateRange,
-            // @ts-ignore
-            params.filters,
-          );
-
-        case "getDailyOvertimeReport":
-          return await this.getDailyOvertimeReport(
-            // @ts-ignore
-            params.date,
-            // @ts-ignore
-            params.filters,
-          );
-
-        case "getMonthlyOvertimeReport":
-          return await this.getMonthlyOvertimeReport(
-            // @ts-ignore
-            params.year,
-            // @ts-ignore
-            params.month,
-            // @ts-ignore
-            params.filters,
-          );
-
-        // ⏰ OVERTIME CALCULATION OPERATIONS
-        case "calculateOvertimeHours":
-          return await this.calculateOvertimeHours(
-            // @ts-ignore
-            params.startTime,
-            // @ts-ignore
-            params.endTime,
-            // @ts-ignore
-            params.breakHours,
-          );
-
-        case "calculateOvertimeAmount":
-          return await this.calculateOvertimeAmount(
-            // @ts-ignore
-            params.hours,
-            // @ts-ignore
-            params.hourlyRate,
-            // @ts-ignore
-            params.overtimeRate,
-            // @ts-ignore
-            params.type,
-          );
-
-        case "checkOvertimeOverlap":
-          return await this.checkOvertimeOverlap(
-            // @ts-ignore
-            params.employeeId,
-            // @ts-ignore
-            params.date,
-            // @ts-ignore
-            params.startTime,
-            // @ts-ignore
-            params.endTime,
-            // @ts-ignore
-            params.excludeId,
-          );
-
-        // ⚙️ VALIDATION & UTILITY OPERATIONS
-        case "validateOvertimeData":
-          return await this.validateOvertimeData(params);
-
-        case "checkDuplicateOvertime":
-          return await this.checkDuplicateOvertime(params);
-
-        case "getOvertimeTypes":
-          // @ts-ignore
-          return await this.getOvertimeTypes(params.category);
-
-        case "getOvertimeStatuses":
-          // @ts-ignore
-          return await this.getOvertimeStatuses();
+        // 📄 REPORT
+        case "exportOvertimeToCSV":
+          return await this.exportOvertimeToCSV(params);
+        case "generateOvertimeReport":
+          return await this.generateOvertimeReport(params);
 
         default:
           return {
@@ -292,11 +103,8 @@ class OvertimeHandler {
           };
       }
     } catch (error) {
-      console.error("OvertimeHandler error:", error);
-      if (logger) {
-        // @ts-ignore
-        logger.error("OvertimeHandler error:", error);
-      }
+      // @ts-ignore
+      logger.error("OvertimeHandler error:", error);
       return {
         status: false,
         // @ts-ignore
@@ -306,45 +114,32 @@ class OvertimeHandler {
     }
   }
 
-  /**
-   * Wrap critical operations in a database transaction
-   * @param {(arg0: any, arg1: import("typeorm").QueryRunner) => any} handler
-   * @param {any} params
-   */
-  async handleWithTransaction(handler, params) {
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
+  // @ts-ignore
+  async logActivity(userId, action, description, qr = null) {
     try {
-      const result = await handler(params, queryRunner);
-
-      if (result.status) {
-        await queryRunner.commitTransaction();
-      } else {
-        await queryRunner.rollbackTransaction();
-      }
-
-      return result;
+      const { AuditLog } = require("../../../entities/AuditLog");
+      const { AppDataSource } = require("../../db/datasource");
+      // @ts-ignore
+      const repo = qr ? qr.manager.getRepository(AuditLog) : AppDataSource.getRepository(AuditLog);
+      const log = repo.create({
+        user: userId,
+        action,
+        description,
+        entity: "OvertimeLog",
+        timestamp: new Date(),
+      });
+      await repo.save(log);
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
+      // @ts-ignore
+      logger.warn("Failed to log overtime activity:", error);
     }
   }
 }
 
-// Register IPC handler
 const overtimeHandler = new OvertimeHandler();
-
 ipcMain.handle(
   "overtime",
-  withErrorHandling(
-    // @ts-ignore
-    overtimeHandler.handleRequest.bind(overtimeHandler),
-    "IPC:overtime",
-  ),
+  withErrorHandling(overtimeHandler.handleRequest.bind(overtimeHandler), "IPC:overtime")
 );
 
 module.exports = { OvertimeHandler, overtimeHandler };

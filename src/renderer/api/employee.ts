@@ -1,240 +1,182 @@
-// employee.ts placeholder
-// employeeAPI.ts
+// src/renderer/api/employee.ts
+// Employee API – katulad ng attendance_log.ts
+
+// ----------------------------------------------------------------------
+// 📦 Types & Interfaces (based on Employee entity)
+// ----------------------------------------------------------------------
+
 export interface Employee {
-  id?: number;
+  id: number;
   employeeNumber: string;
   firstName: string;
-  middleName?: string | null;
+  middleName: string | null;
   lastName: string;
-  email?: string | null;
-  phone?: string | null;
-  address?: string | null;
-  birthDate?: string | null;
-  hireDate: string;
-  position?: string | null;
-  department?: string | null;
-  basePay: number;
-  dailyRate: number;
-  hourlyRate: number;
-  overtimeRate: number;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  birthDate: string | null;          // ISO date
+  hireDate: string;                   // ISO date
+  position: string | null;
+  department: string | null;
+  basePay: number;                    // decimal
+  dailyRate: number;                  // decimal
+  hourlyRate: number;                  // decimal
+  overtimeRate: number;                // decimal
   paymentMethod: string;
-  bankName?: string | null;
-  accountNumber?: string | null;
-  status: 'active' | 'inactive' | 'terminated' | 'on-leave';
-  employmentType: 'regular' | 'contractual' | 'part-time' | 'probationary';
-  sssNumber?: string | null;
-  philhealthNumber?: string | null;
-  pagibigNumber?: string | null;
-  tinNumber?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
+  bankName: string | null;
+  accountNumber: string | null;
+  status: string;                      // 'active', 'inactive', 'terminated', 'on-leave'
+  employmentType: string;               // 'regular', 'contractual', 'part-time', 'probationary'
+  sssNumber: string | null;
+  philhealthNumber: string | null;
+  pagibigNumber: string | null;
+  tinNumber: string | null;
+  createdAt: string;                    // ISO datetime
+  updatedAt: string;                    // ISO datetime
 }
 
-export interface EmployeeFilters {
-  department?: string;
-  position?: string;
-  status?: string;
-  employmentType?: string;
-  search?: string;
-  sortField?: string;
-  sortOrder?: 'ASC' | 'DESC';
-  page?: number;
-  pageSize?: number;
-  hireDateFrom?: string;
-  hireDateTo?: string;
-  minSalary?: number;
-  maxSalary?: number;
-}
-
-export interface PaginatedResponse<T> {
-  employees: T[];
+export interface PaginatedEmployees {
+  items: Employee[];
   total: number;
   page: number;
-  pageSize: number;
+  limit: number;
   totalPages: number;
 }
 
-export interface EmployeeValidationResult {
-  isValid: boolean;
-  errors: string[];
-}
-
-export interface DuplicateCheckResult {
-  hasDuplicates: boolean;
-  duplicates: Array<{
-    field: string;
-    value: string;
-    existingEmployeeId: number;
-    existingEmployeeName: string;
-  }>;
-}
-
-export interface EmployeeNumberResult {
-  employeeNumber: string;
-  prefix: string;
-  sequence: number;
-}
-
-export interface GovernmentValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings: string[];
-  validatedNumbers: {
-    sss?: string;
-    philhealth?: string;
-    pagibig?: string;
-    tin?: string;
-  };
-}
-
-export interface ServiceTenureResult {
-  employeeId: number;
-  employeeName: string;
-  hireDate: string;
-  asOfDate: string;
-  tenure: {
-    years: number;
-    months: number;
-    days: number;
-    totalDays: number;
-    totalMonths: number;
-  };
-  formattedTenure: string;
-  isAnniversary: boolean;
-}
-
-export interface AgeResult {
-  employeeId: number;
-  employeeName: string;
-  birthDate: string;
-  age: number;
-  nextBirthday: string;
-  daysUntilBirthday: number;
-  isBirthdayToday: boolean;
-}
-
-export interface RateCalculationResult {
-  basePay: number;
-  dailyRate: number;
-  hourlyRate: number;
-  overtimeRate: number;
-  workingDays: number;
-  hoursPerDay: number;
-}
-
-export interface SalaryIncreaseDetails {
-  oldBasePay: number;
-  newBasePay: number;
-  increaseType: 'percentage' | 'fixed';
-  increaseValue: number;
-  effectiveDate?: string;
-  increaseAmount: number;
-}
-
-export interface MasterlistSummary {
-  totalEmployees: number;
-  totalBasePay: number;
-  avgBasePay: number;
-  generatedAt: string;
-}
-
-export interface DirectoryData {
-  directoryByDepartment: Record<string, Employee[]>;
-  totalActiveEmployees: number;
-  departments: string[];
-  generatedAt: string;
-}
-
-export interface HeadcountData {
-  headcountData: Array<{ department: string; count: string }>;
-  totalHeadcount: number;
-  asOfDate: string;
-  generatedAt: string;
-}
-
-export interface SalaryReportStatistics {
-  totalEmployees: number;
-  totalSalary: number;
-  avgSalary: number;
-  minSalary: number;
-  maxSalary: number;
-}
-
-export interface SalaryReportData {
-  employees: Employee[];
-  statistics: SalaryReportStatistics;
-  salaryByDepartment: Record<string, {
-    employees: Employee[];
-    totalSalary: number;
-    avgSalary: number;
-  }>;
-  filters: {
-    department?: string;
-    minSalary?: number;
-    maxSalary?: number;
-  };
-  generatedAt: string;
-}
-
-export interface BirthdayReportData {
-  month: number;
-  monthName: string;
-  year: number;
-  totalBirthdays: number;
-  birthdaysByDay: Record<number, Employee[]>;
-  employees: Array<Employee & {
-    age: number;
-    nextBirthday: string;
-    daysUntilBirthday: number;
-  }>;
-  generatedAt: string;
-}
-
-export interface EmployeeCountData {
+export interface EmployeeSummary {
   total: number;
-  byStatus: Array<{ status: string; count: string }>;
-  byDepartment: Array<{ department: string; count: string }>;
-  filters: EmployeeFilters;
+  statusCounts: Array<{ status: string; count: number }>;
+  departmentCounts: Array<{ department: string; count: number }>;
+  employmentTypeCounts: Array<{ employmentType: string; count: number }>;
 }
 
-export interface BaseResponse<T = any> {
+// Para sa bulk operations
+export interface BulkCreateResult {
+  created: Employee[];
+  errors?: Array<{ index: number; error: string }>;
+}
+
+export interface BulkUpdateResult {
+  updated: Array<{ id: number; before: Employee; after: Employee }>;
+  errors?: Array<{ id: number; error: string }>;
+}
+
+export interface FileOperationResult {
+  filePath: string;
+}
+
+export interface ReportResult {
+  filePath: string;
+  format: string;
+  entryCount: number;
+}
+
+// ----------------------------------------------------------------------
+// 📨 Response Interfaces (mirror IPC response format)
+// ----------------------------------------------------------------------
+
+export interface EmployeesResponse {
   status: boolean;
   message: string;
-  data: T;
+  data: Employee[];                     // for getAll, getByDepartment, search, etc.
 }
 
-export interface EmployeePayload {
-  method: string;
-  params?: Record<string, any>;
+export interface PaginatedEmployeesResponse {
+  status: boolean;
+  message: string;
+  data: PaginatedEmployees;
 }
+
+export interface EmployeeResponse {
+  status: boolean;
+  message: string;
+  data: Employee;
+}
+
+export interface EmployeeSummaryResponse {
+  status: boolean;
+  message: string;
+  data: EmployeeSummary;
+}
+
+export interface ExportEmployeesResponse {
+  status: boolean;
+  message: string;
+  data: FileOperationResult;
+}
+
+export interface GenerateReportResponse {
+  status: boolean;
+  message: string;
+  data: ReportResult;
+}
+
+export interface BulkCreateResponse {
+  status: boolean;
+  message: string;
+  data: BulkCreateResult;
+}
+
+export interface BulkUpdateResponse {
+  status: boolean;
+  message: string;
+  data: BulkUpdateResult;
+}
+
+export interface DeleteResponse {
+  status: boolean;
+  message: string;
+  data: null;
+}
+
+// ----------------------------------------------------------------------
+// 🧠 EmployeeAPI Class
+// ----------------------------------------------------------------------
 
 class EmployeeAPI {
-  // 📋 BASIC OPERATIONS
+  // --------------------------------------------------------------------
+  // 🔎 READ-ONLY METHODS
+  // --------------------------------------------------------------------
 
-  async getAllEmployees(filters?: EmployeeFilters): Promise<BaseResponse<PaginatedResponse<Employee>>> {
+  /**
+   * Get all employees with optional filters and pagination.
+   * @param params - { status?, department?, employmentType?, search?, page?, limit? }
+   */
+  async getAll(params?: {
+    status?: string;
+    department?: string;
+    employmentType?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<EmployeesResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "getAllEmployees",
-        params: { filters },
+        params: params || {},
       });
 
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to get employees");
+      throw new Error(response.message || "Failed to fetch employees");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to get employees");
+      throw new Error(error.message || "Failed to fetch employees");
     }
   }
 
-  async getEmployeeById(id: number): Promise<BaseResponse<Employee>> {
+  /**
+   * Get employee by ID.
+   * @param id - Employee ID
+   */
+  async getById(id: number): Promise<EmployeeResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
@@ -245,16 +187,20 @@ class EmployeeAPI {
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to get employee");
+      throw new Error(response.message || "Failed to fetch employee");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee");
+      throw new Error(error.message || "Failed to fetch employee");
     }
   }
 
-  async getEmployeeByNumber(employeeNumber: string): Promise<BaseResponse<Employee>> {
+  /**
+   * Get employee by employee number.
+   * @param employeeNumber - Unique employee number
+   */
+  async getByNumber(employeeNumber: string): Promise<EmployeeResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
@@ -265,141 +211,100 @@ class EmployeeAPI {
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to get employee");
+      throw new Error(response.message || "Failed to fetch employee by number");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee");
+      throw new Error(error.message || "Failed to fetch employee by number");
     }
   }
 
-  async getEmployeesByDepartment(department: string, filters?: EmployeeFilters): Promise<BaseResponse<Employee[]>> {
+  /**
+   * Get employees by department.
+   * @param department - Department name
+   */
+  async getByDepartment(department: string): Promise<EmployeesResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "getEmployeesByDepartment",
-        params: { department, filters },
+        params: { department },
       });
 
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to get employees by department");
+      throw new Error(response.message || "Failed to fetch employees by department");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to get employees by department");
+      throw new Error(error.message || "Failed to fetch employees by department");
     }
   }
 
-  async getEmployeesByPosition(position: string, filters?: EmployeeFilters): Promise<BaseResponse<Employee[]>> {
+  /**
+   * Get employees by status.
+   * @param status - Employee status (active, inactive, terminated, on-leave)
+   */
+  async getByStatus(status: string): Promise<EmployeesResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getEmployeesByPosition",
-        params: { position, filters },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get employees by position");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employees by position");
-    }
-  }
-
-  async getEmployeesByStatus(status: string, filters?: EmployeeFilters): Promise<BaseResponse<Employee[]>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "getEmployeesByStatus",
-        params: { status, filters },
+        params: { status },
       });
 
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to get employees by status");
+      throw new Error(response.message || "Failed to fetch employees by status");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to get employees by status");
+      throw new Error(error.message || "Failed to fetch employees by status");
     }
   }
 
-  async getEmployeesByEmploymentType(employmentType: string, filters?: EmployeeFilters): Promise<BaseResponse<Employee[]>> {
+  /**
+   * Get employee statistics (summary).
+   */
+  async getStats(): Promise<EmployeeSummaryResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
-        method: "getEmployeesByEmploymentType",
-        params: { employmentType, filters },
+        method: "getEmployeeStats",
+        params: {},
       });
 
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to get employees by employment type");
+      throw new Error(response.message || "Failed to fetch employee statistics");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to get employees by employment type");
+      throw new Error(error.message || "Failed to fetch employee statistics");
     }
   }
 
-  async getActiveEmployees(filters?: EmployeeFilters): Promise<BaseResponse<Employee[]>> {
+  /**
+   * Search employees by keyword (name, email, employee number, etc.).
+   * @param params - { search, page?, limit? }
+   */
+  async search(params: {
+    search: string;
+    page?: number;
+    limit?: number;
+  }): Promise<EmployeesResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getActiveEmployees",
-        params: { filters },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get active employees");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get active employees");
-    }
-  }
-
-  async getInactiveEmployees(filters?: EmployeeFilters): Promise<BaseResponse<Employee[]>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getInactiveEmployees",
-        params: { filters },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get inactive employees");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get inactive employees");
-    }
-  }
-
-  async searchEmployees(query: string, filters?: EmployeeFilters): Promise<BaseResponse<PaginatedResponse<Employee>>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "searchEmployees",
-        params: { query, filters },
+        params,
       });
 
       if (response.status) {
@@ -411,37 +316,40 @@ class EmployeeAPI {
     }
   }
 
-  async getEmployeeCount(filters?: EmployeeFilters): Promise<BaseResponse<EmployeeCountData>> {
+  // --------------------------------------------------------------------
+  // ✏️ WRITE OPERATION METHODS
+  // --------------------------------------------------------------------
+
+  /**
+   * Create a new employee.
+   * @param data - Employee data (all required fields except generated ones)
+   * @param user - Optional username (defaults to 'system')
+   */
+  async create(
+    data: Omit<
+      Employee,
+      | "id"
+      | "employeeNumber"
+      | "createdAt"
+      | "updatedAt"
+      | "dailyRate"
+      | "hourlyRate"
+    > & {
+      employeeNumber?: string; // optional, backend can generate
+      dailyRate?: number;
+      hourlyRate?: number;
+    },
+    user: string = "system"
+  ): Promise<EmployeeResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getEmployeeCount",
-        params: { filters },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get employee count");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee count");
-    }
-  }
-
-  // ✏️ WRITE OPERATIONS
-
-  async createEmployee(employeeData: Partial<Employee>): Promise<BaseResponse<Employee>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "createEmployee",
-        params: employeeData,
+        params: data,
+        user,
       });
 
       if (response.status) {
@@ -453,15 +361,26 @@ class EmployeeAPI {
     }
   }
 
-  async updateEmployee(id: number, updateData: Partial<Employee>): Promise<BaseResponse<Employee>> {
+  /**
+   * Update an existing employee.
+   * @param id - Employee ID
+   * @param data - Partial fields to update
+   * @param user - Optional username
+   */
+  async update(
+    id: number,
+    data: Partial<Omit<Employee, "id" | "createdAt" | "updatedAt">>,
+    user: string = "system"
+  ): Promise<EmployeeResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "updateEmployee",
-        params: { id, ...updateData },
+        params: { id, ...data },
+        user,
       });
 
       if (response.status) {
@@ -473,15 +392,21 @@ class EmployeeAPI {
     }
   }
 
-  async deleteEmployee(id: number, reason?: string, userId?: number, userType?: string): Promise<BaseResponse<{ id: number; status: string }>> {
+  /**
+   * Delete an employee.
+   * @param id - Employee ID
+   * @param user - Optional username
+   */
+  async delete(id: number, user: string = "system"): Promise<DeleteResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "deleteEmployee",
-        params: { id, reason, userId, userType },
+        params: { id },
+        user,
       });
 
       if (response.status) {
@@ -493,15 +418,88 @@ class EmployeeAPI {
     }
   }
 
-  async updateEmployeeStatus(id: number, status: Employee['status'], reason?: string, userId?: number, userType?: string): Promise<BaseResponse<Employee>> {
+  /**
+   * Bulk create employees.
+   * @param records - Array of employee data (same as create but without employeeNumber)
+   * @param user - Optional username
+   */
+  async bulkCreate(
+    records: Array<
+      Omit<Employee, "id" | "employeeNumber" | "createdAt" | "updatedAt"> & {
+        employeeNumber?: string;
+      }
+    >,
+    user: string = "system"
+  ): Promise<BulkCreateResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
+      }
+
+      const response = await window.backendAPI.employee({
+        method: "bulkCreateEmployees",
+        params: { employees: records },
+        user,
+      });
+
+      if (response.status) {
+        return response;
+      }
+      throw new Error(response.message || "Failed to bulk create employees");
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to bulk create employees");
+    }
+  }
+
+  /**
+   * Bulk update employees.
+   * @param updates - Array of { id, data }
+   * @param user - Optional username
+   */
+  async bulkUpdate(
+    updates: Array<{ id: number; data: Partial<Omit<Employee, "id" | "createdAt" | "updatedAt">> }>,
+    user: string = "system"
+  ): Promise<BulkUpdateResponse> {
+    try {
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
+      }
+
+      const response = await window.backendAPI.employee({
+        method: "bulkUpdateEmployees",
+        params: { updates },
+        user,
+      });
+
+      if (response.status) {
+        return response;
+      }
+      throw new Error(response.message || "Failed to bulk update employees");
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to bulk update employees");
+    }
+  }
+
+  /**
+   * Update employee status.
+   * @param id - Employee ID
+   * @param status - New status ('active', 'inactive', 'terminated', 'on-leave')
+   * @param user - Optional username
+   */
+  async updateStatus(
+    id: number,
+    status: string,
+    user: string = "system"
+  ): Promise<EmployeeResponse> {
+    try {
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
         method: "updateEmployeeStatus",
-        params: { id, status, reason, userId, userType },
+        params: { id, status },
+        user,
       });
 
       if (response.status) {
@@ -513,696 +511,142 @@ class EmployeeAPI {
     }
   }
 
-  async updateEmployeeSalary(id: number, basePay: number, effectiveDate?: string, reason?: string, userId?: number, userType?: string): Promise<BaseResponse<Employee>> {
+  /**
+   * Terminate an employee (special status update).
+   * @param id - Employee ID
+   * @param reason - Optional termination reason (will be logged)
+   * @param user - Optional username
+   */
+  async terminate(
+    id: number,
+    reason?: string,
+    user: string = "system"
+  ): Promise<EmployeeResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
-        method: "updateEmployeeSalary",
-        params: { id, basePay, effectiveDate, reason, userId, userType },
+        method: "terminateEmployee",
+        params: { id, reason },
+        user,
       });
 
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to update employee salary");
+      throw new Error(response.message || "Failed to terminate employee");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to update employee salary");
+      throw new Error(error.message || "Failed to terminate employee");
     }
   }
 
-  async updateEmployeeDepartment(id: number, department: string, reason?: string, userId?: number, userType?: string): Promise<BaseResponse<Employee>> {
+  // --------------------------------------------------------------------
+  // 📁 EXPORT & REPORT METHODS
+  // --------------------------------------------------------------------
+
+  /**
+   * Export employees to CSV.
+   * @param filters - Optional filters (status, department, etc.)
+   * @param columns - Optional list of columns to include
+   */
+  async exportCSV(
+    filters?: {
+      status?: string;
+      department?: string;
+      employmentType?: string;
+    },
+    columns?: string[]
+  ): Promise<ExportEmployeesResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
-        method: "updateEmployeeDepartment",
-        params: { id, department, reason, userId, userType },
+        method: "exportEmployeesToCSV",
+        params: { filters, columns },
       });
 
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to update employee department");
+      throw new Error(response.message || "Failed to export employees to CSV");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to update employee department");
+      throw new Error(error.message || "Failed to export employees to CSV");
     }
   }
 
-  async updateEmployeePosition(id: number, position: string, reason?: string, userId?: number, userType?: string): Promise<BaseResponse<Employee>> {
+  /**
+   * Generate an employee report.
+   * @param params - { includeDetails?, department? }
+   */
+  async generateReport(params?: {
+    includeDetails?: boolean;
+    department?: string;
+    format?: "json" | "html";
+  }): Promise<GenerateReportResponse> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
+      if (!window.backendAPI?.employee) {
+        throw new Error("Electron API (employee) not available");
       }
 
       const response = await window.backendAPI.employee({
-        method: "updateEmployeePosition",
-        params: { id, position, reason, userId, userType },
+        method: "generateEmployeeReport",
+        params: params || {},
       });
 
       if (response.status) {
         return response;
       }
-      throw new Error(response.message || "Failed to update employee position");
+      throw new Error(response.message || "Failed to generate employee report");
     } catch (error: any) {
-      throw new Error(error.message || "Failed to update employee position");
+      throw new Error(error.message || "Failed to generate employee report");
     }
   }
 
-  async updateEmployeeBankInfo(id: number, bankInfo: { bankName?: string; accountNumber?: string; paymentMethod?: string }, userId?: number, userType?: string): Promise<BaseResponse<Employee>> {
+  // --------------------------------------------------------------------
+  // 🧰 UTILITY METHODS
+  // --------------------------------------------------------------------
+
+  /**
+   * Check if an employee exists.
+   * @param id - Employee ID
+   */
+  async exists(id: number): Promise<boolean> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "updateEmployeeBankInfo",
-        params: { id, ...bankInfo, userId, userType },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to update employee bank info");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to update employee bank info");
+      const response = await this.getById(id);
+      return response.status;
+    } catch {
+      return false;
     }
   }
 
-  async updateEmployeeGovernmentIds(id: number, govtIds: { sssNumber?: string; philhealthNumber?: string; pagibigNumber?: string; tinNumber?: string }, userId?: number, userType?: string): Promise<BaseResponse<Employee>> {
+  /**
+   * Check if an employee number is already taken.
+   * @param employeeNumber - Employee number to check
+   */
+  async isEmployeeNumberTaken(employeeNumber: string): Promise<boolean> {
     try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "updateEmployeeGovernmentIds",
-        params: { id, ...govtIds, userId, userType },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to update employee government IDs");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to update employee government IDs");
+      const response = await this.getByNumber(employeeNumber);
+      return response.status;
+    } catch {
+      return false;
     }
   }
 
-  // 💰 PAYROLL OPERATIONS
-
-  async calculateEmployeeRates(employeeId: number, basePay?: number): Promise<BaseResponse<RateCalculationResult>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "calculateEmployeeRates",
-        params: { employeeId, basePay },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to calculate employee rates");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to calculate employee rates");
-    }
-  }
-
-  async updateEmployeePayrollInfo(id: number, payrollInfo: { basePay?: number; dailyRate?: number; hourlyRate?: number; overtimeRate?: number; paymentMethod?: string }, userId?: number, userType?: string): Promise<BaseResponse<Employee>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "updateEmployeePayrollInfo",
-        params: { id, ...payrollInfo, userId, userType },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to update employee payroll info");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to update employee payroll info");
-    }
-  }
-
-  async applySalaryIncrease(id: number, increaseType: 'percentage' | 'fixed', increaseValue: number, effectiveDate?: string, reason?: string, userId?: number, userType?: string): Promise<BaseResponse<Employee & { increaseDetails: SalaryIncreaseDetails }>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "applySalaryIncrease",
-        params: { id, increaseType, increaseValue, effectiveDate, reason, userId, userType },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to apply salary increase");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to apply salary increase");
-    }
-  }
-
-  // 📊 REPORT OPERATIONS
-
-  async getEmployeeMasterlist(filters?: EmployeeFilters): Promise<BaseResponse<{ employees: Employee[]; summary: MasterlistSummary }>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getEmployeeMasterlist",
-        params: { filters },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get employee masterlist");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee masterlist");
-    }
-  }
-
-  async getEmployeeDirectory(filters?: EmployeeFilters): Promise<BaseResponse<DirectoryData>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getEmployeeDirectory",
-        params: { filters },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get employee directory");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee directory");
-    }
-  }
-
-  async getDepartmentHeadcount(date?: string): Promise<BaseResponse<HeadcountData>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getDepartmentHeadcount",
-        params: { date },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get department headcount");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get department headcount");
-    }
-  }
-
-  async getEmployeeSalaryReport(department?: string, minSalary?: number, maxSalary?: number): Promise<BaseResponse<SalaryReportData>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getEmployeeSalaryReport",
-        params: { department, minSalary, maxSalary },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get employee salary report");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee salary report");
-    }
-  }
-
-  async getEmployeeBirthdayReport(month?: number, year?: number): Promise<BaseResponse<BirthdayReportData>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getEmployeeBirthdayReport",
-        params: { month, year },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get employee birthday report");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee birthday report");
-    }
-  }
-
-  // ⚙️ VALIDATION & UTILITY OPERATIONS
-
-  async validateEmployeeData(employeeData: Partial<Employee>): Promise<BaseResponse<EmployeeValidationResult>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "validateEmployeeData",
-        params: employeeData,
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to validate employee data");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to validate employee data");
-    }
-  }
-
-  async checkDuplicateEmployee(employeeData: Partial<Employee>): Promise<BaseResponse<DuplicateCheckResult>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "checkDuplicateEmployee",
-        params: employeeData,
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to check for duplicates");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to check for duplicates");
-    }
-  }
-
-  async generateEmployeeNumber(prefix?: string): Promise<BaseResponse<EmployeeNumberResult>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "generateEmployeeNumber",
-        params: { prefix },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to generate employee number");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to generate employee number");
-    }
-  }
-
-  async validateGovernmentNumbers(sss?: string, philhealth?: string, pagibig?: string, tin?: string): Promise<BaseResponse<GovernmentValidationResult>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "validateGovernmentNumbers",
-        params: { sss, philhealth, pagibig, tin },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to validate government numbers");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to validate government numbers");
-    }
-  }
-
-  async calculateServiceTenure(employeeId: number, asOfDate?: string): Promise<BaseResponse<ServiceTenureResult>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "calculateServiceTenure",
-        params: { employeeId, asOfDate },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to calculate service tenure");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to calculate service tenure");
-    }
-  }
-
-  async getEmployeeAge(employeeId: number): Promise<BaseResponse<AgeResult>> {
-    try {
-      if (!window.backendAPI || !window.backendAPI.employee) {
-        throw new Error("Electron API not available");
-      }
-
-      const response = await window.backendAPI.employee({
-        method: "getEmployeeAge",
-        params: { employeeId },
-      });
-
-      if (response.status) {
-        return response;
-      }
-      throw new Error(response.message || "Failed to get employee age");
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee age");
-    }
-  }
-
-  // 🔧 UTILITY METHODS
-
-  async getEmployeeByEmail(email: string): Promise<BaseResponse<Employee>> {
-    try {
-      // Use search method to find by email
-      const response = await this.searchEmployees(email, { pageSize: 1 });
-      
-      if (response.status && response.data.employees.length > 0) {
-        const employee = response.data.employees[0];
-        if (employee.email === email) {
-          return {
-            status: true,
-            message: "Employee found",
-            data: employee
-          };
-        }
-      }
-      
-      return {
-        status: false,
-        message: "Employee not found",
-        data: null as any
-      };
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee by email");
-    }
-  }
-
-  async getEmployeesBySalaryRange(minSalary: number, maxSalary: number, filters?: EmployeeFilters): Promise<BaseResponse<Employee[]>> {
-    try {
-      const allFilters: EmployeeFilters = {
-        ...filters,
-        minSalary,
-        maxSalary
-      };
-      
-      const response = await this.searchEmployees("", allFilters);
-      return {
-        status: response.status,
-        message: response.message,
-        data: response.data.employees
-      };
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employees by salary range");
-    }
-  }
-
-  async getRecentHires(days: number = 30): Promise<BaseResponse<Employee[]>> {
-    try {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - days);
-      
-      const hireDateFrom = thirtyDaysAgo.toISOString().split('T')[0];
-      
-      const response = await this.searchEmployees("", {
-        hireDateFrom,
-        sortField: "hireDate",
-        sortOrder: "DESC"
-      });
-      
-      return {
-        status: response.status,
-        message: response.message,
-        data: response.data.employees
-      };
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get recent hires");
-    }
-  }
-
-  async getUpcomingBirthdays(days: number = 30): Promise<BaseResponse<Employee[]>> {
-    try {
-      // Get all active employees with birth dates
-      const response = await this.getActiveEmployees();
-      
-      if (!response.status) {
-        return response;
-      }
-      
-      const today = new Date();
-      const futureDate = new Date();
-      futureDate.setDate(today.getDate() + days);
-      
-      const upcomingBirthdays = response.data.filter(employee => {
-        if (!employee.birthDate) return false;
-        
-        const birthDate = new Date(employee.birthDate);
-        const nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
-        
-        if (nextBirthday < today) {
-          nextBirthday.setFullYear(today.getFullYear() + 1);
-        }
-        
-        return nextBirthday <= futureDate && nextBirthday >= today;
-      });
-      
-      // Sort by next birthday
-      upcomingBirthdays.sort((a, b) => {
-        const dateA = new Date(a.birthDate!);
-        const dateB = new Date(b.birthDate!);
-        
-        const nextA = new Date(today.getFullYear(), dateA.getMonth(), dateA.getDate());
-        const nextB = new Date(today.getFullYear(), dateB.getMonth(), dateB.getDate());
-        
-        if (nextA < today) nextA.setFullYear(today.getFullYear() + 1);
-        if (nextB < today) nextB.setFullYear(today.getFullYear() + 1);
-        
-        return nextA.getTime() - nextB.getTime();
-      });
-      
-      return {
-        status: true,
-        message: "Upcoming birthdays retrieved",
-        data: upcomingBirthdays
-      };
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get upcoming birthdays");
-    }
-  }
-
-  async getEmployeeStatistics(): Promise<BaseResponse<{
-    totalEmployees: number;
-    activeEmployees: number;
-    inactiveEmployees: number;
-    averageSalary: number;
-    departments: Array<{ name: string; count: number; avgSalary: number }>;
-  }>> {
-    try {
-      const [countResponse, activeResponse, salaryReport] = await Promise.all([
-        this.getEmployeeCount(),
-        this.getActiveEmployees(),
-        this.getEmployeeSalaryReport()
-      ]);
-      
-      if (!countResponse.status || !activeResponse.status || !salaryReport.status) {
-        throw new Error("Failed to get statistics");
-      }
-      
-      const total = countResponse.data.total;
-      const active = activeResponse.data.length;
-      const inactive = total - active;
-      const avgSalary = salaryReport.data.statistics.avgSalary;
-      
-      // Get department statistics
-      const departments = Object.entries(salaryReport.data.salaryByDepartment).map(([name, data]) => ({
-        name,
-        count: data.employees.length,
-        avgSalary: data.avgSalary
-      }));
-      
-      return {
-        status: true,
-        message: "Statistics retrieved",
-        data: {
-          totalEmployees: total,
-          activeEmployees: active,
-          inactiveEmployees: inactive,
-          averageSalary: avgSalary,
-          departments
-        }
-      };
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to get employee statistics");
-    }
-  }
-
-  async validateAndCreateEmployee(employeeData: Partial<Employee>): Promise<BaseResponse<Employee>> {
-    try {
-      // First validate the data
-      const validation = await this.validateEmployeeData(employeeData);
-      if (!validation.data.isValid) {
-        return {
-          status: false,
-          message: "Validation failed",
-          data: validation.data as any
-        };
-      }
-      
-      // Check for duplicates
-      const duplicateCheck = await this.checkDuplicateEmployee(employeeData);
-      if (duplicateCheck.data.hasDuplicates) {
-        return {
-          status: false,
-          message: "Duplicate employee found",
-          data: duplicateCheck.data as any
-        };
-      }
-      
-      // Validate government numbers if provided
-      if (employeeData.sssNumber || employeeData.philhealthNumber || employeeData.pagibigNumber || employeeData.tinNumber) {
-        const govtValidation = await this.validateGovernmentNumbers(
-          employeeData.sssNumber as string | undefined,
-          employeeData.philhealthNumber as string | undefined,
-          employeeData.pagibigNumber as string | undefined,
-          employeeData.tinNumber as string | undefined
-        );
-        
-        if (!govtValidation.data.isValid) {
-          return {
-            status: false,
-            message: "Government number validation failed",
-            data: govtValidation.data as any
-          };
-        }
-      }
-      
-      // Generate employee number if not provided
-      if (!employeeData.employeeNumber) {
-        const numberResult = await this.generateEmployeeNumber();
-        if (numberResult.status) {
-          employeeData.employeeNumber = numberResult.data.employeeNumber;
-        }
-      }
-      
-      // Create the employee
-      return await this.createEmployee(employeeData);
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to validate and create employee");
-    }
-  }
-
-  async bulkUpdateStatus(employeeIds: number[], status: Employee['status'], reason?: string, userId?: number, userType?: string): Promise<BaseResponse<{ updated: number; failed: number; results: Array<{ id: number; success: boolean; message: string }> }>> {
-    try {
-      const results = [];
-      let updated = 0;
-      let failed = 0;
-      
-      for (const id of employeeIds) {
-        try {
-          const result = await this.updateEmployeeStatus(id, status, reason, userId, userType);
-          if (result.status) {
-            updated++;
-            results.push({ id, success: true, message: "Updated successfully" });
-          } else {
-            failed++;
-            results.push({ id, success: false, message: result.message });
-          }
-        } catch (error: any) {
-          failed++;
-          results.push({ id, success: false, message: error.message });
-        }
-      }
-      
-      return {
-        status: true,
-        message: `Bulk update completed: ${updated} updated, ${failed} failed`,
-        data: { updated, failed, results }
-      };
-    } catch (error: any) {
-      throw new Error(error.message || "Failed to bulk update status");
-    }
-  }
-
-  // 🎲 HELPER METHODS
-
-  formatEmployeeName(employee: Employee): string {
-    const middleInitial = employee.middleName ? ` ${employee.middleName.charAt(0)}.` : '';
-    return `${employee.firstName}${middleInitial} ${employee.lastName}`.trim();
-  }
-
-  calculateYearsOfService(employee: Employee, asOfDate?: string): number {
-    const hireDate = new Date(employee.hireDate);
-    const endDate = asOfDate ? new Date(asOfDate) : new Date();
-    
-    let years = endDate.getFullYear() - hireDate.getFullYear();
-    const monthDiff = endDate.getMonth() - hireDate.getMonth();
-    const dayDiff = endDate.getDate() - hireDate.getDate();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      years--;
-    }
-    
-    return years;
-  }
-
-  formatSalary(salary: number): string {
-    return new Intl.NumberFormat('en-PH', {
-      style: 'currency',
-      currency: 'PHP',
-      minimumFractionDigits: 2
-    }).format(salary);
-  }
-
-  getEmployeeStatusColor(status: Employee['status']): string {
-    const colors: Record<Employee['status'], string> = {
-      'active': 'green',
-      'inactive': 'gray',
-      'terminated': 'red',
-      'on-leave': 'blue'
-    };
-    return colors[status] || 'gray';
-  }
-
-  getEmploymentTypeLabel(type: Employee['employmentType']): string {
-    const labels: Record<Employee['employmentType'], string> = {
-      'regular': 'Regular',
-      'contractual': 'Contractual',
-      'part-time': 'Part-time',
-      'probationary': 'Probationary'
-    };
-    return labels[type] || type;
+  /**
+   * Validate if the backend API is available.
+   */
+  async isAvailable(): Promise<boolean> {
+    return !!(window.backendAPI?.employee);
   }
 }
 
-const employeeAPI = new EmployeeAPI();
+// ----------------------------------------------------------------------
+// 📤 Export singleton instance
+// ----------------------------------------------------------------------
 
+const employeeAPI = new EmployeeAPI();
 export default employeeAPI;

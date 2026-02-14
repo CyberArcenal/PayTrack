@@ -1,39 +1,28 @@
-// ===================== by_status.ipc.js =====================
+// @ts-check
+
+const employeeService = require("../../../../services/Employee");
 const { logger } = require("../../../../utils/logger");
-const { AppDataSource } = require("../../../db/datasource");
+
 
 /**
  * Get employees by status
- * @param {string} status
- * @param {Object} filters
- * @returns {Promise<{status: boolean, message: string, data: any}>}
+ * @param {Object} params - { status }
+ * @returns {Promise<{status: boolean, message?: string, data?: any}>}
  */
-module.exports = async function getEmployeesByStatus(status, filters = {}) {
+module.exports = async (params) => {
   try {
-    const employeeRepo = AppDataSource.getRepository("Employee");
-    const queryBuilder = employeeRepo.createQueryBuilder("employee")
-      .where("employee.status = :status", { status });
-
-    if (filters.department) {
-      queryBuilder.andWhere("employee.department = :department", { department: filters.department });
-    }
-    if (filters.employmentType) {
-      queryBuilder.andWhere("employee.employmentType = :employmentType", { employmentType: filters.employmentType });
+    // @ts-ignore
+    if (!params.status) {
+      return { status: false, message: "Status is required" };
     }
 
-    const employees = await queryBuilder.getMany();
-
-    return {
-      status: true,
-      message: `${status} employees retrieved successfully`,
-      data: employees,
-    };
+    // @ts-ignore
+    const employees = await employeeService.findAll({ status: params.status });
+    return { status: true, data: employees };
   } catch (error) {
+    // @ts-ignore
     logger.error("Error in getEmployeesByStatus:", error);
-    return {
-      status: false,
-      message: error.message || "Failed to retrieve employees by status",
-      data: null,
-    };
+    // @ts-ignore
+    return { status: false, message: error.message || "Failed to fetch employees by status" };
   }
 };

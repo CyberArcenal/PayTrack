@@ -1,1 +1,0 @@
-// update.ipc.js placeholder

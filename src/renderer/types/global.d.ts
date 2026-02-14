@@ -4,6 +4,7 @@ declare global {
   interface Window {
     backendAPI: {
       // 🔑 Activation
+      audit: (payload: any) => Promise<any>;
       dashboard: (payload: any) => Promise<any>;
       activation: (payload: any) => Promise<any>;
       attendance: (payload: any) => Promise<any>;
